@@ -1,19 +1,19 @@
 <idea-plugin>
-    <id>com.github.unthrottled.themerandomizer</id>
-    <name>theme-randomizer</name>
-    <vendor>unthrottled</vendor>
+  <id>com.github.unthrottled.themerandomizer</id>
+  <name>theme-randomizer</name>
+  <vendor>unthrottled</vendor>
 
-    <!-- Product and plugin compatibility requirements -->
-    <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-    <depends>com.intellij.modules.platform</depends>
+  <!-- Product and plugin compatibility requirements -->
+  <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+  <depends>com.intellij.modules.platform</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.unthrottled.themerandomizer.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.unthrottled.themerandomizer.services.MyProjectService"/>
-    </extensions>
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="com.github.unthrottled.themerandomizer.services.MyApplicationService"/>
+    <projectService serviceImplementation="com.github.unthrottled.themerandomizer.services.MyProjectService"/>
+  </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.unthrottled.themerandomizer.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
+  <applicationListeners>
+    <listener class="com.github.unthrottled.themerandomizer.listeners.MyProjectManagerListener"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
+  </applicationListeners>
 </idea-plugin>
