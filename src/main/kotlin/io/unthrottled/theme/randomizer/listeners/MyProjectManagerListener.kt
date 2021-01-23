@@ -1,6 +1,6 @@
-package com.github.unthrottled.themerandomizer.listeners
+package io.unthrottled.theme.randomizer.listeners
 
-import com.github.unthrottled.themerandomizer.services.MyProjectService
+import io.unthrottled.theme.randomizer.services.MyProjectService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener

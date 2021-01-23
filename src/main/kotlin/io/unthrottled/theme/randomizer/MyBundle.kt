@@ -1,4 +1,4 @@
-package com.github.unthrottled.themerandomizer
+package io.unthrottled.theme.randomizer
 
 import com.intellij.AbstractBundle
 import org.jetbrains.annotations.NonNls

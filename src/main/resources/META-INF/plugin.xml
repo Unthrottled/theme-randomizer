@@ -1,19 +1,19 @@
 <idea-plugin>
-  <id>com.github.unthrottled.themerandomizer</id>
+  <id>io.uthrottled.theme.randomizer</id>
   <name>theme-randomizer</name>
-  <vendor>unthrottled</vendor>
+  <vendor>Unthrottled</vendor>
 
   <!-- Product and plugin compatibility requirements -->
   <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceImplementation="com.github.unthrottled.themerandomizer.services.MyApplicationService"/>
-    <projectService serviceImplementation="com.github.unthrottled.themerandomizer.services.MyProjectService"/>
+    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.MyApplicationService"/>
+    <projectService serviceImplementation="io.unthrottled.theme.randomizer.services.MyProjectService"/>
   </extensions>
 
   <applicationListeners>
-    <listener class="com.github.unthrottled.themerandomizer.listeners.MyProjectManagerListener"
+    <listener class="io.unthrottled.theme.randomizer.listeners.MyProjectManagerListener"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
 </idea-plugin>

@@ -1,6 +1,6 @@
-package com.github.unthrottled.themerandomizer.services
+package io.unthrottled.theme.randomizer.services
 
-import com.github.unthrottled.themerandomizer.MyBundle
+import io.unthrottled.theme.randomizer.MyBundle
 import com.intellij.openapi.project.Project
 
 class MyProjectService(project: Project) {
