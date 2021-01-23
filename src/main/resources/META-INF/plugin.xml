@@ -1,5 +1,5 @@
 <idea-plugin>
-  <id>io.uthrottled.theme.randomizer</id>
+  <id>io.unthrottled.theme.randomizer</id>
   <name>theme-randomizer</name>
   <vendor>Unthrottled</vendor>
 
@@ -8,7 +8,9 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.MyApplicationService"/>
+    <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
     <projectService serviceImplementation="io.unthrottled.theme.randomizer.services.MyProjectService"/>
   </extensions>
 
