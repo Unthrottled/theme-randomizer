@@ -1,7 +1,7 @@
 package io.unthrottled.theme.randomizer.services
 
-import io.unthrottled.theme.randomizer.MyBundle
 import com.intellij.openapi.project.Project
+import io.unthrottled.theme.randomizer.MyBundle
 
 class MyProjectService(project: Project) {
 

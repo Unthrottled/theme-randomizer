@@ -28,5 +28,4 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   override fun loadState(state: Config) {
     copyBean(state, this)
   }
-
 }
