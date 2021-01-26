@@ -8,6 +8,9 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <applicationConfigurable id="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
+                             instance="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
+    />
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.MyApplicationService"/>
     <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
