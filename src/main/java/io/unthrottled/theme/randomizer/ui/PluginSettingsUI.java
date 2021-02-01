@@ -5,10 +5,13 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.NlsContexts;
+import com.intellij.util.ui.JBUI;
+import io.unthrottled.theme.randomizer.services.ThemeGatekeeper;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -16,10 +19,17 @@ import javax.swing.JTabbedPane;
 public class PluginSettingsUI implements SearchableConfigurable, Configurable.NoScroll, DumbAware {
   private JTabbedPane tabbedPane1;
   private JPanel panel1;
-  private JPanel lafList;
+  private JPanel lafListPane;
+  private LAFListPanel lafListPanelModel;
 
   private void createUIComponents() {
-    // TODO: place custom component creation code here
+    lafListPanelModel = new LAFListPanel(
+      ThemeGatekeeper.Companion.getInstance()::isPreferred
+    );
+    lafListPane = lafListPanelModel.getComponent();
+    lafListPane.setPreferredSize(JBUI.size(800, 600));
+    lafListPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
   }
 
   @Override
@@ -41,7 +51,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
 
   @Override
   public boolean isModified() {
-    return false;
+    return lafListPanelModel.isModified();
   }
 
   @Override

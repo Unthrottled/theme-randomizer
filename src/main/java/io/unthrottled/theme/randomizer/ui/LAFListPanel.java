@@ -9,12 +9,12 @@ import java.awt.BorderLayout;
 import java.util.List;
 import java.util.function.Predicate;
 
-public final class PreferredCharacterPanel {
+public final class LAFListPanel {
   private final PreferredCharacterTree myPreferredCharacterTree;
   private JPanel myPanel;
   private JPanel myTreePanel;
 
-  public PreferredCharacterPanel(
+  public LAFListPanel(
     Predicate<UIManager.LookAndFeelInfo> selectionPredicate
   ) {
     myPreferredCharacterTree = new PreferredCharacterTree(selectionPredicate);

@@ -12,6 +12,7 @@
                              instance="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
     />
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
+    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.ThemeGatekeeper"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.MyApplicationService"/>
     <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
     <projectService serviceImplementation="io.unthrottled.theme.randomizer.services.MyProjectService"/>
@@ -21,4 +22,16 @@
     <listener class="io.unthrottled.theme.randomizer.listeners.MyProjectManagerListener"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
+  <actions>
+    <group id="ThemeRandomizerActions" text="Theme Randomizer Options" popup="true" >
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <action id="theme.randomizer.settings" class="io.unthrottled.theme.randomizer.actions.ShowSettingsAction"
+              text="Show Theme Randomizer's Settings"
+              icon="AllIcons.General.GearPlain"
+              description="Displays theme randomizer's settings">
+        <keyboard-shortcut keymap="$default" first-keystroke="shift alt S"/>
+      </action>
+    </group>
+  </actions>
+
 </idea-plugin>

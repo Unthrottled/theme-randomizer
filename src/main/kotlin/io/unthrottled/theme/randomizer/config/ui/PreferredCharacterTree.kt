@@ -33,7 +33,7 @@ import javax.swing.UIManager
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
 
-data class CharacterData(
+data class ThemeData(
   val lookAndFeelInfo: UIManager.LookAndFeelInfo
 )
 
@@ -62,7 +62,7 @@ class PreferredCharacterTree(
     component.add(toolbarPanel, BorderLayout.NORTH)
     component.add(scrollPane, BorderLayout.CENTER)
     myFilter.reset()
-    reset(copyAndSort(getCharacterList()))
+    reset(copyAndSort(getThemeList()))
   }
 
   private fun createTree() =
@@ -80,7 +80,7 @@ class PreferredCharacterTree(
           if (value !is CheckedTreeNode) return
 
           val attributes =
-            if (value.userObject is CharacterData) SimpleTextAttributes.REGULAR_ATTRIBUTES
+            if (value.userObject is ThemeData) SimpleTextAttributes.REGULAR_ATTRIBUTES
             else SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
           val text = getNodeText(value)
           val background = UIUtil.getTreeBackground(selected, true)
@@ -98,14 +98,14 @@ class PreferredCharacterTree(
       CheckedTreeNode(null)
     )
 
-  fun filterModel(filter: String?, force: Boolean): List<CharacterData> {
-    val list: List<CharacterData> = getCharacterList()
+  fun filterModel(filter: String?, force: Boolean): List<ThemeData> {
+    val list: List<ThemeData> = getThemeList()
     if (filter.isNullOrEmpty()) {
       return list
     }
 
-    var result: List<CharacterData> =
-      getCharacterList {
+    var result: List<ThemeData> =
+      getThemeList {
         it.name.contains(filter, ignoreCase = true)
       }
 
@@ -118,26 +118,26 @@ class PreferredCharacterTree(
     return result
   }
 
-  fun filter(intentionsToShow: List<CharacterData>) {
+  fun filter(intentionsToShow: List<ThemeData>) {
     refreshCheckStatus(myTree.model.root as CheckedTreeNode)
     reset(copyAndSort(intentionsToShow))
   }
 
   fun reset() {
     characterCheckStatus.clear()
-    reset(copyAndSort(getCharacterList()))
+    reset(copyAndSort(getThemeList()))
   }
 
-  private fun getCharacterList(predicate: (UIManager.LookAndFeelInfo) -> Boolean = { true }) =
+  private fun getThemeList(predicate: (UIManager.LookAndFeelInfo) -> Boolean = { true }) =
     LafManager.getInstance().installedLookAndFeels
       .filter(predicate)
-      .map { CharacterData(it) }
+      .map { ThemeData(it) }
       .sortedBy { it.lookAndFeelInfo.name }
 
-  private fun reset(sortedCharacterData: List<CharacterData>) {
+  private fun reset(sortedThemeData: List<ThemeData>) {
     val root = CheckedTreeNode(null)
     val treeModel = myTree.model as DefaultTreeModel
-    sortedCharacterData.forEach { characterData ->
+    sortedThemeData.forEach { characterData ->
       val animeRoot = CheckedTreeNode(characterData.lookAndFeelInfo)
       treeModel.insertNodeInto(animeRoot, root, root.childCount)
     }
@@ -227,9 +227,9 @@ class PreferredCharacterTree(
 
   companion object {
     private const val HISTORY_LENGTH = 10
-    private fun copyAndSort(intentionsToShow: List<CharacterData>): List<CharacterData> {
-      val copy: MutableList<CharacterData> = ArrayList(intentionsToShow)
-      copy.sortWith { data1: CharacterData, data2: CharacterData ->
+    private fun copyAndSort(intentionsToShow: List<ThemeData>): List<ThemeData> {
+      val copy: MutableList<ThemeData> = ArrayList(intentionsToShow)
+      copy.sortWith { data1: ThemeData, data2: ThemeData ->
         data1.lookAndFeelInfo.name.compareTo(data2.lookAndFeelInfo.name)
       }
       return copy
