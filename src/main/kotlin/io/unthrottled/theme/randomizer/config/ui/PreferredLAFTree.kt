@@ -37,7 +37,7 @@ data class ThemeData(
   val lookAndFeelInfo: UIManager.LookAndFeelInfo
 )
 
-class PreferredCharacterTree(
+class PreferredLAFTree(
   private val selectionPredicate: Predicate<UIManager.LookAndFeelInfo>
 ) {
   private val characterCheckStatus: MutableMap<String, Boolean> = HashMap()
@@ -137,9 +137,10 @@ class PreferredCharacterTree(
   private fun reset(sortedThemeData: List<ThemeData>) {
     val root = CheckedTreeNode(null)
     val treeModel = myTree.model as DefaultTreeModel
-    sortedThemeData.forEach { characterData ->
-      val animeRoot = CheckedTreeNode(characterData.lookAndFeelInfo)
-      treeModel.insertNodeInto(animeRoot, root, root.childCount)
+    sortedThemeData.forEach { themeData ->
+      val themeRoot = CheckedTreeNode(themeData.lookAndFeelInfo)
+      themeRoot.isChecked = selectionPredicate.test(themeData.lookAndFeelInfo)
+      treeModel.insertNodeInto(themeRoot, root, root.childCount)
     }
     treeModel.setRoot(root)
     treeModel.nodeChanged(root)
@@ -187,7 +188,7 @@ class PreferredCharacterTree(
       if (filter.isNullOrEmpty().not() && !myExpansionMonitor.isFreeze) {
         myExpansionMonitor.freeze()
       }
-      this@PreferredCharacterTree.filter(filterModel(filter, true))
+      this@PreferredLAFTree.filter(filterModel(filter, true))
       val expandedPaths = TreeUtil.collectExpandedPaths(
         myTree
       )
@@ -216,7 +217,7 @@ class PreferredCharacterTree(
           myExpansionMonitor.freeze()
         }
       }
-      this@PreferredCharacterTree.filter(filterModel(filter, true))
+      this@PreferredLAFTree.filter(filterModel(filter, true))
       TreeUtil.expandAll(myTree)
       if (filter == null || filter.isEmpty()) {
         TreeUtil.collapseAll(myTree, 0)
@@ -244,12 +245,12 @@ class PreferredCharacterTree(
     private fun getSelectedCharacters(root: CheckedTreeNode): List<UIManager.LookAndFeelInfo> {
       val visitQueue = LinkedList<CheckedTreeNode>()
       visitQueue.push(root)
-      val selectedCharacters = LinkedList<UIManager.LookAndFeelInfo>()
+      val selectedThemes = LinkedList<UIManager.LookAndFeelInfo>()
       while (visitQueue.isNotEmpty()) {
         val current = visitQueue.pop()
         val userObject = current.userObject
         if (current.isChecked && userObject is UIManager.LookAndFeelInfo) {
-          selectedCharacters.push(userObject)
+          selectedThemes.push(userObject)
         }
         val currentChildren = current.children()
         while (currentChildren.hasMoreElements()) {
@@ -257,7 +258,7 @@ class PreferredCharacterTree(
           visitQueue.push(child)
         }
       }
-      return selectedCharacters
+      return selectedThemes
     }
 
     private fun isModified(

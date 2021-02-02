@@ -23,29 +23,27 @@ class ThemeGatekeeper : Disposable {
   private fun extractAllowedCharactersFromState(characterConfig: String): Set<String> =
     characterConfig.split(Config.DEFAULT_DELIMITER)
       .filter { it.isNotEmpty() }
-      .map { it.toLowerCase() }
       .toSet()
 
   init {
     connection.subscribe(
       CONFIG_TOPIC,
       ConfigListener { newPluginState ->
-        preferredCharactersIds = extractAllowedCharactersFromState(Config.instance.selectedThemes)
+        preferredCharactersIds = extractAllowedCharactersFromState(newPluginState.selectedThemes)
       }
     )
   }
 
-  fun hasPreferredCharacter(characters: List<UIManager.LookAndFeelInfo>): Boolean =
-    preferredCharactersIds.isEmpty() ||
-      characters.any { isPreferred(it) }
-
-  fun isPreferred(character: UIManager.LookAndFeelInfo): Boolean =
+  fun isPreferred(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
     preferredCharactersIds.contains(
-      when (character) {
-        is UIThemeBasedLookAndFeelInfo -> character.theme.id
-        else -> character.name
-      }
+      getId(lookAndFeelInfo)
     )
+
+  fun getId(lookAndFeelInfo: UIManager.LookAndFeelInfo): String =
+    when (lookAndFeelInfo) {
+      is UIThemeBasedLookAndFeelInfo -> lookAndFeelInfo.theme.id
+      else -> lookAndFeelInfo.name
+    }
 
   override fun dispose() {
     connection.dispose()

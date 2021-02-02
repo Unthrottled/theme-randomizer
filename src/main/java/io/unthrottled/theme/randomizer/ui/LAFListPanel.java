@@ -1,7 +1,7 @@
 package io.unthrottled.theme.randomizer.ui;
 
 import com.intellij.ui.GuiUtils;
-import io.unthrottled.theme.randomizer.config.ui.PreferredCharacterTree;
+import io.unthrottled.theme.randomizer.config.ui.PreferredLAFTree;
 
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -10,26 +10,26 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public final class LAFListPanel {
-  private final PreferredCharacterTree myPreferredCharacterTree;
+  private final PreferredLAFTree myLAFTree;
   private JPanel myPanel;
   private JPanel myTreePanel;
 
   public LAFListPanel(
     Predicate<UIManager.LookAndFeelInfo> selectionPredicate
   ) {
-    myPreferredCharacterTree = new PreferredCharacterTree(selectionPredicate);
+    myLAFTree = new PreferredLAFTree(selectionPredicate);
     myTreePanel.setLayout(new BorderLayout());
-    myTreePanel.add(myPreferredCharacterTree.getComponent(), BorderLayout.CENTER);
+    myTreePanel.add(myLAFTree.getComponent(), BorderLayout.CENTER);
 
     GuiUtils.replaceJSplitPaneWithIDEASplitter(myPanel);
   }
 
   public void reset() {
-    myPreferredCharacterTree.reset();
+    myLAFTree.reset();
   }
 
   public List<UIManager.LookAndFeelInfo> getSelected() {
-    return myPreferredCharacterTree.getSelected();
+    return myLAFTree.getSelected();
   }
 
   public JPanel getComponent() {
@@ -37,17 +37,17 @@ public final class LAFListPanel {
   }
 
   public boolean isModified() {
-    return myPreferredCharacterTree.isModified();
+    return myLAFTree.isModified();
   }
 
   public void dispose() {
-    myPreferredCharacterTree.dispose();
+    myLAFTree.dispose();
   }
 
   public Runnable showOption(final String option) {
     return () -> {
-      myPreferredCharacterTree.filter(myPreferredCharacterTree.filterModel(option, true));
-      myPreferredCharacterTree.setFilter(option);
+      myLAFTree.filter(myLAFTree.filterModel(option, true));
+      myLAFTree.setFilter(option);
     };
   }
 }
