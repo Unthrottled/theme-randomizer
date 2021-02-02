@@ -12,8 +12,9 @@
                              instance="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
     />
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
+    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.LAFProbabilityService"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.ThemeGatekeeper"/>
-    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.MyApplicationService"/>
+    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.ThemeService"/>
     <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
     <projectService serviceImplementation="io.unthrottled.theme.randomizer.services.MyProjectService"/>
   </extensions>

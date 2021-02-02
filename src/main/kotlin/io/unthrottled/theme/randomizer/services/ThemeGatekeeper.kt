@@ -13,11 +13,15 @@ class ThemeGatekeeper : Disposable {
   companion object {
     val instance: ThemeGatekeeper
       get() = ServiceManager.getService(ThemeGatekeeper::class.java)
+
+    @JvmStatic
+    fun getId(lookAndFeelInfo: UIManager.LookAndFeelInfo): String =
+      lookAndFeelInfo.getId()
   }
 
   private val connection = ApplicationManager.getApplication().messageBus.connect()
 
-  private var preferredCharactersIds: Set<String> =
+  private var preferredThemeIds: Set<String> =
     extractAllowedCharactersFromState(Config.instance.selectedThemes)
 
   private fun extractAllowedCharactersFromState(characterConfig: String): Set<String> =
@@ -29,23 +33,26 @@ class ThemeGatekeeper : Disposable {
     connection.subscribe(
       CONFIG_TOPIC,
       ConfigListener { newPluginState ->
-        preferredCharactersIds = extractAllowedCharactersFromState(newPluginState.selectedThemes)
+        preferredThemeIds = extractAllowedCharactersFromState(newPluginState.selectedThemes)
       }
     )
   }
 
-  fun isPreferred(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
-    preferredCharactersIds.contains(
-      getId(lookAndFeelInfo)
-    )
+  fun isLegit(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
+    preferredThemeIds.isEmpty() || isPreferred(lookAndFeelInfo)
 
-  fun getId(lookAndFeelInfo: UIManager.LookAndFeelInfo): String =
-    when (lookAndFeelInfo) {
-      is UIThemeBasedLookAndFeelInfo -> lookAndFeelInfo.theme.id
-      else -> lookAndFeelInfo.name
-    }
+  fun isPreferred(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
+    preferredThemeIds.contains(
+      lookAndFeelInfo.getId()
+    )
 
   override fun dispose() {
     connection.dispose()
   }
 }
+
+fun UIManager.LookAndFeelInfo.getId(): String =
+  when (this) {
+    is UIThemeBasedLookAndFeelInfo -> this.theme.id
+    else -> this.name
+  }

@@ -121,7 +121,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   @NotNull
   private String convertToStorageString(LAFListPanel lafListPanel) {
     return lafListPanel.getSelected().stream()
-      .map(ThemeGatekeeper.Companion.getInstance()::getId)
+      .map(ThemeGatekeeper::getId)
       .collect(Collectors.joining(Config.DEFAULT_DELIMITER));
   }
 }
