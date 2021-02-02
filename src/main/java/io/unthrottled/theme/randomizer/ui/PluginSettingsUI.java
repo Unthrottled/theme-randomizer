@@ -1,15 +1,17 @@
 package io.unthrottled.theme.randomizer.ui;
 
-import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.util.ui.JBUI;
+import io.unthrottled.theme.randomizer.config.ChangeIntervals;
 import io.unthrottled.theme.randomizer.config.Config;
 import io.unthrottled.theme.randomizer.config.ConfigListener;
 import io.unthrottled.theme.randomizer.config.ConfigSettingsModel;
+import io.unthrottled.theme.randomizer.config.IntervalTuple;
+import io.unthrottled.theme.randomizer.config.SettingsHelper;
 import io.unthrottled.theme.randomizer.services.ThemeGatekeeper;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import java.util.Arrays;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -33,7 +36,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JPanel lafListPane;
   private JCheckBox changeThemeCheckbox;
   private JCheckBox randomOrderCheckbox;
-  private JComboBox<String> changeIntervalWomboComboBox;
+  private JComboBox<IntervalTuple> changeIntervalWomboComboBox;
   private LAFListPanel lafListPanelModel;
 
   private void createUIComponents() {
@@ -63,22 +66,37 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     changeIntervalWomboComboBox.setModel(
       new DefaultComboBoxModel<>(
         new Vector<>(
-          Lists.newArrayList(
-            "Ayy", "lmao"
-          )
+          Arrays.stream(ChangeIntervals.values())
+            .map(this::createIntervalTuple)
+            .collect(Collectors.toList())
         )
       )
     );
-    changeIntervalWomboComboBox.getModel().setSelectedItem(
-      initialSettings.getInterval()
-    );
-    changeThemeCheckbox.addActionListener(e ->
-      pluginSettingsModel.setInterval((String) changeIntervalWomboComboBox.getModel().getSelectedItem()));
+
+    ChangeIntervals.Companion.getValue(initialSettings.getInterval())
+      .ifPresent(value -> changeIntervalWomboComboBox.getModel().setSelectedItem(
+        createIntervalTuple(value)
+      ));
+
+    changeIntervalWomboComboBox.addActionListener(e ->
+      pluginSettingsModel.setInterval(
+        ((IntervalTuple) changeIntervalWomboComboBox.getModel().getSelectedItem())
+          .getInterval().toString()));
 
     changeThemeCheckbox.setSelected(initialSettings.isChangeTheme());
+    changeThemeCheckbox.addActionListener(e ->
+      pluginSettingsModel.setChangeTheme(changeThemeCheckbox.isSelected()));
+
     randomOrderCheckbox.setSelected(initialSettings.isRandomOrder());
+    randomOrderCheckbox.addActionListener(e ->
+      pluginSettingsModel.setRandomOrder(randomOrderCheckbox.isSelected()));
 
     return rootPane;
+  }
+
+  @NotNull
+  private IntervalTuple createIntervalTuple(ChangeIntervals value) {
+    return new IntervalTuple(value, SettingsHelper.getDisplayMapping(value));
   }
 
   @Override
