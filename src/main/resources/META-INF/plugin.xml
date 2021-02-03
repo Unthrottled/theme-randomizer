@@ -13,6 +13,7 @@
     />
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.LAFProbabilityService"/>
+    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.PluginMaster"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.ThemeGatekeeper"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.ThemeService"/>
     <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
@@ -20,11 +21,13 @@
   </extensions>
 
   <applicationListeners>
+    <listener class="io.unthrottled.theme.randomizer.listeners.IDEPluginInstallListener"
+              topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     <listener class="io.unthrottled.theme.randomizer.listeners.MyProjectManagerListener"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
   <actions>
-    <group id="ThemeRandomizerActions" text="Theme Randomizer Options" popup="true" >
+    <group id="ThemeRandomizerActions" text="Theme Randomizer Options" popup="true">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
       <action id="theme.randomizer.settings" class="io.unthrottled.theme.randomizer.actions.ShowSettingsAction"
               text="Show Theme Randomizer's Settings"
