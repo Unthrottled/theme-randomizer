@@ -12,6 +12,7 @@ import io.unthrottled.theme.randomizer.config.ConfigListener;
 import io.unthrottled.theme.randomizer.config.ConfigSettingsModel;
 import io.unthrottled.theme.randomizer.config.IntervalTuple;
 import io.unthrottled.theme.randomizer.config.SettingsHelper;
+import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor;
 import io.unthrottled.theme.randomizer.services.ThemeGatekeeper;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +38,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JCheckBox changeThemeCheckbox;
   private JCheckBox randomOrderCheckbox;
   private JComboBox<IntervalTuple> changeIntervalWomboComboBox;
+  private JCheckBox animationCheckbox;
   private LAFListPanel lafListPanelModel;
 
   private void createUIComponents() {
@@ -91,6 +93,10 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     randomOrderCheckbox.addActionListener(e ->
       pluginSettingsModel.setRandomOrder(randomOrderCheckbox.isSelected()));
 
+    animationCheckbox.setSelected(initialSettings.isThemeTransition());
+    animationCheckbox.addActionListener(e ->
+      pluginSettingsModel.setThemeTransition(animationCheckbox.isSelected()));
+
     return rootPane;
   }
 
@@ -112,6 +118,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     config.setChangeTheme(pluginSettingsModel.isChangeTheme());
     config.setRandomOrder(pluginSettingsModel.isRandomOrder());
     config.setSelectedThemes(convertToStorageString(lafListPanelModel));
+    LafAnimationActor.INSTANCE.enableAnimation(pluginSettingsModel.isThemeTransition());
     ApplicationManager.getApplication().getMessageBus().syncPublisher(
       ConfigListener.Companion.getCONFIG_TOPIC()
     ).pluginConfigUpdated(config);

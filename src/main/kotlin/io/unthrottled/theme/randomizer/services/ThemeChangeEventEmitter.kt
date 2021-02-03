@@ -13,7 +13,7 @@ import io.unthrottled.theme.randomizer.config.ConfigListener.Companion.CONFIG_TO
 import io.unthrottled.theme.randomizer.listeners.ThemeChangedListener
 import java.util.concurrent.TimeUnit
 
-class ThemeChangeEventEmitter() : Runnable, Disposable {
+class ThemeChangeEventEmitter : Runnable, Disposable {
   private val messageBus = ApplicationManager.getApplication().messageBus.connect()
   private val log = Logger.getInstance(this::class.java)
   private val themeChangeAlarm = Alarm()
@@ -45,6 +45,7 @@ class ThemeChangeEventEmitter() : Runnable, Disposable {
   private fun getIdleTimeInMinutes(): Long =
     getThemeChangeInterval(Config.instance)
 
+  @SuppressWarnings("MagicNumber")
   private fun getThemeChangeInterval(newPluginState: Config): Long =
     ChangeIntervals.getValue(newPluginState.interval)
       .map {
@@ -64,9 +65,9 @@ class ThemeChangeEventEmitter() : Runnable, Disposable {
 
   override fun run() {
     log.warn("Finna change theme")
-    val nextTheme = if (Config.instance.isRandomOrder)
+    val nextTheme = if (Config.instance.isRandomOrder) {
       ThemeService.instance.getRandomTheme()
-    else ThemeService.instance.getNextTheme()
+    } else ThemeService.instance.getNextTheme()
     nextTheme.ifPresent {
       QuickChangeLookAndFeel.switchLafAndUpdateUI(
         LafManager.getInstance(),

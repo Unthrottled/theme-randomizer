@@ -6,11 +6,13 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil.copyBean
 import com.intellij.util.xmlb.XmlSerializerUtil.createCopy
+import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor
 
 data class ConfigSettingsModel(
   var interval: String,
   var isChangeTheme: Boolean,
   var isRandomOrder: Boolean,
+  var isThemeTransition: Boolean,
 ) {
   fun duplicate(): ConfigSettingsModel = copy()
 }
@@ -30,7 +32,8 @@ class Config : PersistentStateComponent<Config>, Cloneable {
     fun getInitialConfigSettingsModel() = ConfigSettingsModel(
       interval = instance.interval,
       isChangeTheme = instance.isChangeTheme,
-      isRandomOrder = instance.isRandomOrder
+      isRandomOrder = instance.isRandomOrder,
+      isThemeTransition = LafAnimationActor.getAnimationEnabled(),
     )
   }
 
