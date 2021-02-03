@@ -2,10 +2,7 @@ package io.unthrottled.theme.randomizer.services
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
-import io.unthrottled.theme.randomizer.config.ConfigListener
-import io.unthrottled.theme.randomizer.config.ConfigListener.Companion.CONFIG_TOPIC
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.util.Collections
 import java.util.Optional
@@ -18,19 +15,9 @@ class ThemeService : Disposable {
       get() = ServiceManager.getService(ThemeService::class.java)
   }
 
-  private val connection = ApplicationManager.getApplication().messageBus.connect()
-
-  init {
-    connection.subscribe(
-      CONFIG_TOPIC,
-      ConfigListener { newPluginState ->
-      }
-    )
-  }
-
   fun getRandomTheme(): Optional<UIManager.LookAndFeelInfo> =
     LAFProbabilityService.instance.pickAssetFromList(
-      getPreferredThemes()
+      getPreferredThemes().shuffled()
     )
 
   private fun getPreferredThemes() =
@@ -38,21 +25,30 @@ class ThemeService : Disposable {
       .filter { ThemeGatekeeper.instance.isLegit(it) }
 
   fun getNextTheme(): Optional<UIManager.LookAndFeelInfo> {
-    val themes = getPreferredThemes().sortedBy { it.getId() }
-    val themeIndex = Collections.binarySearch(
-      themes,
-      LafManager.getInstance().currentLookAndFeel,
-      { themeOne, themeTwo ->
-        themeOne.getId().compareTo(themeTwo.getId())
-      }
-    )
+    val themes = getPreferredThemes().sortedBy { it.name }
+    val currentLookAndFeel = LafManager.getInstance().currentLookAndFeel
+    val themeIndex = themes.indexOfLast {
+      it.getId() == currentLookAndFeel.getId()
+    }
 
     return themes.toOptional()
       .filter { it.isNotEmpty() }
-      .map { it[(if (themeIndex > -1) themeIndex + 1 else abs(themeIndex)) % it.size] }
+      .map {
+        it[
+          (
+            if (themeIndex > -1) themeIndex + 1 else abs(
+              Collections.binarySearch(
+                themes,
+                currentLookAndFeel,
+                { themeOne, themeTwo ->
+                  themeOne.name.compareTo(themeTwo.name)
+                }
+              ) + 1
+            )
+            ) % it.size
+        ]
+      }
   }
 
-  override fun dispose() {
-    connection.dispose()
-  }
+  override fun dispose() {}
 }

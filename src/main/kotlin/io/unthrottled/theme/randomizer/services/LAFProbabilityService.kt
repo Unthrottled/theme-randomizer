@@ -35,7 +35,7 @@ class LAFProbabilityService : Disposable, ThemeChangedListener, Runnable {
     )
   }
 
-  private val seenAssetLedger = AssetObservationService.getInitialLedger()
+  private val seenAssetLedger = ThemeObservationService.getInitialLedger()
 
   private val random = java.util.Random()
   private val probabilityTools = ProbabilityTools(
@@ -68,14 +68,14 @@ class LAFProbabilityService : Disposable, ThemeChangedListener, Runnable {
 
   override fun dispose() {
     messageBusConnection.dispose()
-    AssetObservationService.persistLedger(seenAssetLedger)
+    ThemeObservationService.persistLedger(seenAssetLedger)
     IdeEventQueue.getInstance().removeIdleListener(this)
   }
 
   override fun onChanged(lookAndFeelInfo: UIManager.LookAndFeelInfo) {
-    val visualMemeId = lookAndFeelInfo.getId()
-    seenAssetLedger.assetSeenCounts[visualMemeId] =
-      getAssetSeenCount(visualMemeId) + 1
+    val themeId = lookAndFeelInfo.getId()
+    seenAssetLedger.assetSeenCounts[themeId] =
+      getAssetSeenCount(themeId) + 1
   }
 
   // This prevents newly seen assets from always being
@@ -87,7 +87,7 @@ class LAFProbabilityService : Disposable, ThemeChangedListener, Runnable {
   }
 
   override fun run() {
-    val updatedLedger = AssetObservationService.persistLedger(seenAssetLedger)
+    val updatedLedger = ThemeObservationService.persistLedger(seenAssetLedger)
     updatedLedger.assetSeenCounts.forEach { (assetId, assetSeenCount) ->
       seenAssetLedger.assetSeenCounts[assetId] = assetSeenCount
     }

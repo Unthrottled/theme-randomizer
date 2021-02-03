@@ -22,13 +22,13 @@ enum class AssetCategory(val directory: String) {
   META("meta")
 }
 
-data class AssetObservationLedger(
+data class ThemeObservationLedger(
   val assetSeenCounts: ConcurrentMap<String, Int>,
   val writeDate: Instant,
 )
 
-object AssetObservationService {
-  private val log = Logger.getInstance(AssetObservationService::class.java)
+object ThemeObservationService {
+  private val log = Logger.getInstance(ThemeObservationService::class.java)
 
   private const val MAX_ALLOWED_DAYS_PERSISTED = 7L
 
@@ -40,20 +40,20 @@ object AssetObservationService {
     "seen-themes-ledger.json"
   )
 
-  fun getInitialLedger(): AssetObservationLedger =
+  fun getInitialLedger(): ThemeObservationLedger =
     if (ledgerPath.exists()) {
       readLedger()
     } else {
       buildDefaultLedger()
     }
 
-  private fun readLedger(): AssetObservationLedger =
+  private fun readLedger(): ThemeObservationLedger =
     runSafelyWithResult({
       Files.newInputStream(ledgerPath)
         .use {
           gson.fromJson(
             InputStreamReader(it, StandardCharsets.UTF_8),
-            AssetObservationLedger::class.java
+            ThemeObservationLedger::class.java
           )
         }
     }) {
@@ -79,9 +79,9 @@ object AssetObservationService {
         buildDefaultLedger()
       }
 
-  private fun buildDefaultLedger() = AssetObservationLedger(ConcurrentHashMap(), Instant.now())
+  private fun buildDefaultLedger() = ThemeObservationLedger(ConcurrentHashMap(), Instant.now())
 
-  fun persistLedger(assetObservationLedger: AssetObservationLedger): AssetObservationLedger {
+  fun persistLedger(themeObservationLedger: ThemeObservationLedger): ThemeObservationLedger {
     if (ledgerPath.exists().not()) {
       LocalStorageService.createDirectories(ledgerPath)
     }
@@ -92,7 +92,7 @@ object AssetObservationService {
         StandardOpenOption.CREATE,
         StandardOpenOption.TRUNCATE_EXISTING
       ).use {
-        val mostCurrentLedger = combineWithOnDisk(assetObservationLedger)
+        val mostCurrentLedger = combineWithOnDisk(themeObservationLedger)
         it.write(
           gson.toJson(mostCurrentLedger)
         )
@@ -100,16 +100,16 @@ object AssetObservationService {
       }
     }) {
       log.warn("Unable to persist ledger for raisins", it)
-      assetObservationLedger
+      themeObservationLedger
     }
   }
 
-  private fun combineWithOnDisk(assetObservationLedger: AssetObservationLedger): AssetObservationLedger {
+  private fun combineWithOnDisk(themeObservationLedger: ThemeObservationLedger): ThemeObservationLedger {
     val onDisk = readLedger()
-    return assetObservationLedger.copy(
+    return themeObservationLedger.copy(
       assetSeenCounts = Stream.concat(
         onDisk.assetSeenCounts.entries.stream(),
-        assetObservationLedger.assetSeenCounts.entries.stream()
+        themeObservationLedger.assetSeenCounts.entries.stream()
       ).collect(
         Collectors.toConcurrentMap(
           { it.key },

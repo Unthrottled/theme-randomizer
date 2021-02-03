@@ -42,7 +42,6 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
   private fun scheduleThemeChange() {
     themeChangeAlarm.addRequest(
       this,
-//      5000L
       TimeUnit.MILLISECONDS.convert(
         getIdleTimeInMinutes(),
         TimeUnit.MINUTES
