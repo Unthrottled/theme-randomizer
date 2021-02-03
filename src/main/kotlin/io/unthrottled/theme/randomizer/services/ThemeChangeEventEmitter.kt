@@ -24,17 +24,25 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
       CONFIG_TOPIC,
       ConfigListener { newPluginState ->
         themeChangeAlarm.cancelAllRequests()
-        themeChangeAlarm.addRequest(
-          self,
-          TimeUnit.MILLISECONDS.convert(
-            getThemeChangeInterval(newPluginState),
-            TimeUnit.MINUTES
-          ).toInt()
-        )
+        if (newPluginState.isChangeTheme) {
+          themeChangeAlarm.addRequest(
+            self,
+            TimeUnit.MILLISECONDS.convert(
+              getThemeChangeInterval(newPluginState),
+              TimeUnit.MINUTES
+            ).toInt()
+          )
+        }
       }
     )
+
+    scheduleThemeChange()
+  }
+
+  private fun scheduleThemeChange() {
     themeChangeAlarm.addRequest(
       this,
+//      5000L
       TimeUnit.MILLISECONDS.convert(
         getIdleTimeInMinutes(),
         TimeUnit.MINUTES
@@ -64,6 +72,8 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
   }
 
   override fun run() {
+    if (Config.instance.isChangeTheme.not()) return
+
     log.warn("Finna change theme")
     val nextTheme = if (Config.instance.isRandomOrder) {
       ThemeService.instance.getRandomTheme()
@@ -77,5 +87,6 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
       ApplicationManager.getApplication().messageBus
         .syncPublisher(ThemeChangedListener.TOPIC)
     }
+    scheduleThemeChange()
   }
 }

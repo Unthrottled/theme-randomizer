@@ -33,8 +33,9 @@ class ThemeService : Disposable {
       getPreferredThemes()
     )
 
-  private fun getPreferredThemes() = LafManager.getInstance().installedLookAndFeels
-    .filter { ThemeGatekeeper.instance.isLegit(it) }
+  private fun getPreferredThemes() =
+    LafManager.getInstance().installedLookAndFeels
+      .filter { ThemeGatekeeper.instance.isLegit(it) }
 
   fun getNextTheme(): Optional<UIManager.LookAndFeelInfo> {
     val themes = getPreferredThemes().sortedBy { it.getId() }
