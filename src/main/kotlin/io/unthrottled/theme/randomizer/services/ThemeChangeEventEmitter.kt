@@ -11,7 +11,6 @@ import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ConfigListener
 import io.unthrottled.theme.randomizer.config.ConfigListener.Companion.CONFIG_TOPIC
 import io.unthrottled.theme.randomizer.listeners.ThemeChangedListener
-import io.unthrottled.theme.randomizer.tools.runSafelyWithResult
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -31,7 +30,7 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
           themeChangeAlarm.addRequest(
             self,
             TimeUnit.MILLISECONDS.convert(
-              getThemeChangeInterval(newPluginState),
+              getThemeSwitchCheckIntervalFromState(newPluginState),
               TimeUnit.MINUTES
             ).toInt()
           )
@@ -49,43 +48,35 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
 
   private fun getDuration(): Long =
     if (Config.instance.lastChangeTime > -1) {
-      runSafelyWithResult({
-        maxOf(
-          getIdleTimeInMinutes() - Duration.between(
-            Instant.ofEpochSecond(Config.instance.lastChangeTime),
-            Instant.now()
-          ).toMinutes(),
-          0
-        )
-      }) { getIdleTimeInMinutes() }
+      getThemeSwitchCheckInterval()
     } else {
       captureTimestamp()
-      getIdleTimeInMinutes()
+      getThemeSwitchCheckInterval()
     }
 
   private fun scheduleThemeChange() {
     themeChangeAlarm.addRequest(
       this,
       TimeUnit.MILLISECONDS.convert(
-        getIdleTimeInMinutes(),
+        getThemeSwitchCheckInterval(),
         TimeUnit.MINUTES
       ).toInt()
     )
   }
 
-  private fun getIdleTimeInMinutes(): Long =
-    getThemeChangeInterval(Config.instance)
+  private fun getThemeSwitchCheckInterval(): Long =
+    getThemeSwitchCheckIntervalFromState(Config.instance)
 
   @SuppressWarnings("MagicNumber")
-  private fun getThemeChangeInterval(newPluginState: Config): Long =
+  private fun getThemeSwitchCheckIntervalFromState(newPluginState: Config): Long =
     ChangeIntervals.getValue(newPluginState.interval)
       .map {
         when (it) {
-          ChangeIntervals.FIVE_MINUTES -> 5L
-          ChangeIntervals.FIFTEEN_MINUTES -> 15L
           ChangeIntervals.THIRTY_MINUTES -> 30L
+          ChangeIntervals.WEEK,
+          ChangeIntervals.TWO_DAYS,
+          ChangeIntervals.DAY,
           ChangeIntervals.HOUR -> 60L
-          ChangeIntervals.DAY -> 1440L
         }
       }.orElse(60L)
 
@@ -95,7 +86,7 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
   }
 
   override fun run() {
-    if (Config.instance.isChangeTheme.not()) return
+    if (Config.instance.isChangeTheme.not() || isTime().not()) return
 
     val nextTheme = if (Config.instance.isRandomOrder) {
       ThemeService.instance.getRandomTheme()
@@ -106,11 +97,32 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
         it,
         true
       )
-      captureTimestamp()
+      captureTimestamp() // todo: reset timestamp on manual laf setting
       ApplicationManager.getApplication().messageBus
         .syncPublisher(ThemeChangedListener.TOPIC)
     }
     scheduleThemeChange()
+  }
+
+  private fun isTime(): Boolean {
+    return getThemeChangeIntervalInMinutes() <= Duration.between(
+      Instant.ofEpochSecond(Config.instance.lastChangeTime),
+      Instant.now()
+    ).toMinutes()
+  }
+
+  @SuppressWarnings("MagicNumber")
+  private fun getThemeChangeIntervalInMinutes(): Long {
+    return ChangeIntervals.getValue(Config.instance.interval)
+      .map {
+        when (it) {
+          ChangeIntervals.THIRTY_MINUTES -> 30L
+          ChangeIntervals.HOUR -> 60L
+          ChangeIntervals.DAY -> 1440L
+          ChangeIntervals.TWO_DAYS -> 2880L
+          ChangeIntervals.WEEK -> 10080L
+        }
+      }.orElse(60L)
   }
 
   private fun captureTimestamp() {

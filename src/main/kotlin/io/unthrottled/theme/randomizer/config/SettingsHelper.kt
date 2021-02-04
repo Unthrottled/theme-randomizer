@@ -5,11 +5,11 @@ object SettingsHelper {
   @JvmStatic
   fun getDisplayMapping(changeIntervals: ChangeIntervals): String =
     when (changeIntervals) {
-      ChangeIntervals.DAY -> /*smoke weed*/ "Every day"
-      ChangeIntervals.HOUR -> "Every Hour"
       ChangeIntervals.THIRTY_MINUTES -> "Every 30 Minutes"
-      ChangeIntervals.FIFTEEN_MINUTES -> "Every 15 Minutes"
-      ChangeIntervals.FIVE_MINUTES -> "Every 5 Minutes"
+      ChangeIntervals.HOUR -> "Every Hour"
+      ChangeIntervals.DAY -> /*smoke weed*/ "Every day"
+      ChangeIntervals.TWO_DAYS -> "Every other day"
+      ChangeIntervals.WEEK -> "Every 7 days"
     }
 }
 

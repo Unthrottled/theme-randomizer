@@ -5,11 +5,12 @@ import io.unthrottled.theme.randomizer.tools.toOptional
 import java.util.Optional
 
 enum class ChangeIntervals {
-  FIVE_MINUTES,
-  FIFTEEN_MINUTES,
   THIRTY_MINUTES,
   HOUR,
-  DAY;
+  DAY,
+  TWO_DAYS,
+  WEEK,
+  ;
 
   companion object {
     fun getValue(value: String): Optional<ChangeIntervals> =
