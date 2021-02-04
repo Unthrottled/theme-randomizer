@@ -43,6 +43,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var userId: String = ""
   var version: String = ""
   var selectedThemes = ""
+  var lastChangeTime = -1L
 
   override fun getState(): Config? =
     createCopy(this)

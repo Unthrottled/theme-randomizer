@@ -17,7 +17,7 @@ class ThemeService : Disposable {
 
   fun getRandomTheme(): Optional<UIManager.LookAndFeelInfo> =
     LAFProbabilityService.instance.pickAssetFromList(
-      getPreferredThemes().shuffled()
+      getPreferredThemes()
     )
 
   private fun getPreferredThemes() =

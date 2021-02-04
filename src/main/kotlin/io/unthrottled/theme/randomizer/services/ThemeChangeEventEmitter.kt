@@ -11,6 +11,9 @@ import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ConfigListener
 import io.unthrottled.theme.randomizer.config.ConfigListener.Companion.CONFIG_TOPIC
 import io.unthrottled.theme.randomizer.listeners.ThemeChangedListener
+import io.unthrottled.theme.randomizer.tools.runSafelyWithResult
+import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 class ThemeChangeEventEmitter : Runnable, Disposable {
@@ -35,9 +38,29 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
         }
       }
     )
-
-    scheduleThemeChange()
+    themeChangeAlarm.addRequest(
+      this,
+      TimeUnit.MILLISECONDS.convert(
+        getDuration(),
+        TimeUnit.MINUTES
+      ).toInt()
+    )
   }
+
+  private fun getDuration(): Long =
+    if (Config.instance.lastChangeTime > -1) {
+      runSafelyWithResult({
+        maxOf(
+          getIdleTimeInMinutes() - Duration.between(
+            Instant.ofEpochSecond(Config.instance.lastChangeTime),
+            Instant.now()
+          ).toMinutes(),
+          0
+        )
+      }) { getIdleTimeInMinutes() }
+    } else {
+      getIdleTimeInMinutes()
+    }
 
   private fun scheduleThemeChange() {
     themeChangeAlarm.addRequest(
@@ -73,7 +96,6 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
   override fun run() {
     if (Config.instance.isChangeTheme.not()) return
 
-    log.warn("Finna change theme")
     val nextTheme = if (Config.instance.isRandomOrder) {
       ThemeService.instance.getRandomTheme()
     } else ThemeService.instance.getNextTheme()
@@ -83,6 +105,7 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
         it,
         true
       )
+      Config.instance.lastChangeTime = Instant.now().epochSecond
       ApplicationManager.getApplication().messageBus
         .syncPublisher(ThemeChangedListener.TOPIC)
     }
