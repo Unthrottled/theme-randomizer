@@ -10,6 +10,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable id="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
                              instance="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
+                             groupId="appearance"
     />
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.LAFProbabilityService"/>
