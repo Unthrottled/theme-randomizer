@@ -59,6 +59,7 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
         )
       }) { getIdleTimeInMinutes() }
     } else {
+      captureTimestamp()
       getIdleTimeInMinutes()
     }
 
@@ -105,10 +106,14 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
         it,
         true
       )
-      Config.instance.lastChangeTime = Instant.now().epochSecond
+      captureTimestamp()
       ApplicationManager.getApplication().messageBus
         .syncPublisher(ThemeChangedListener.TOPIC)
     }
     scheduleThemeChange()
+  }
+
+  private fun captureTimestamp() {
+    Config.instance.lastChangeTime = Instant.now().epochSecond
   }
 }

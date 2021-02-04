@@ -60,7 +60,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
 
   @Override
   public @NlsContexts.ConfigurableName String getDisplayName() {
-    return "Theme Randomizer Settings";
+    return "Theme Randomizer";
   }
 
   @Override
