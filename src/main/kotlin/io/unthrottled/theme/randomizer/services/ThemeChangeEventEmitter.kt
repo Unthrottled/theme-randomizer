@@ -2,6 +2,7 @@ package io.unthrottled.theme.randomizer.services
 
 import com.intellij.ide.actions.QuickChangeLookAndFeel
 import com.intellij.ide.ui.LafManager
+import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
@@ -15,7 +16,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-class ThemeChangeEventEmitter : Runnable, Disposable {
+class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   private val messageBus = ApplicationManager.getApplication().messageBus.connect()
   private val log = Logger.getInstance(this::class.java)
   private val themeChangeAlarm = Alarm()
@@ -36,6 +37,10 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
           )
         }
       }
+    )
+    messageBus.subscribe(
+      LafManagerListener.TOPIC,
+      this,
     )
     themeChangeAlarm.addRequest(
       this,
@@ -85,6 +90,8 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
     themeChangeAlarm.dispose()
   }
 
+  private var themeSet = LafManager.getInstance().currentLookAndFeel
+
   override fun run() {
     if (Config.instance.isChangeTheme.not() || isTime().not()) return
 
@@ -92,12 +99,13 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
       ThemeService.instance.getRandomTheme()
     } else ThemeService.instance.getNextTheme()
     nextTheme.ifPresent {
+      themeSet = it
       QuickChangeLookAndFeel.switchLafAndUpdateUI(
         LafManager.getInstance(),
         it,
         true
       )
-      captureTimestamp() // todo: reset timestamp on manual laf setting
+      captureTimestamp()
       ApplicationManager.getApplication().messageBus
         .syncPublisher(ThemeChangedListener.TOPIC)
     }
@@ -127,5 +135,13 @@ class ThemeChangeEventEmitter : Runnable, Disposable {
 
   private fun captureTimestamp() {
     Config.instance.lastChangeTime = Instant.now().epochSecond
+  }
+
+  override fun lookAndFeelChanged(source: LafManager) {
+    val currentLookAndFeel = source.currentLookAndFeel
+    if (currentLookAndFeel.getId() != themeSet.getId()) {
+      themeSet = currentLookAndFeel
+      captureTimestamp()
+    }
   }
 }
