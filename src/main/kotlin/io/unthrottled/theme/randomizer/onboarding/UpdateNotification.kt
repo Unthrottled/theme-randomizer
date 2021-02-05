@@ -21,10 +21,10 @@ private val UPDATE_MESSAGE: String =
   """
       What's New?<br>
       <ul>
-        <li>Initial Release! See the <a href="https://github.com/Unthrottled/AMII#documentation">
+        <li>Initial Release! See the <a href="https://github.com/Unthrottled/theme-randomizer#configuration">
       documentation</a> for features, usages, and configurations.</li>
       </ul>
-      <br>Please see the <a href="https://github.com/Unthrottled/AMII/blob/master/CHANGELOG.md">changelog</a> for more details.
+      <br>Please see the <a href="https://github.com/Unthrottled/theme-randomizer/blob/master/CHANGELOG.md">changelog</a> for more details.
       Thanks for downloading!
       </div>
   """.trimIndent()
