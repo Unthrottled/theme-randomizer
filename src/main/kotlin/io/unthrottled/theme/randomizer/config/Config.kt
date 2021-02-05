@@ -37,7 +37,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
     )
   }
 
-  var interval: String = ChangeIntervals.HOUR.toString()
+  var interval: String = ChangeIntervals.DAY.toString()
   var isChangeTheme: Boolean = true
   var isRandomOrder: Boolean = true
   var userId: String = ""
