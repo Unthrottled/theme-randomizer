@@ -1,4 +1,4 @@
-# theme-randomizer
+# Theme Randomizer
 
 ![Build](https://github.com/Unthrottled/theme-randomizer/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
@@ -55,7 +55,7 @@ Toggles the built-in theme change fade animation.
 _The animations will remain in your IDE after uninstalling the plugin._
 
 To remove them, un-check this action or toggle the action at
-<kbd>Help<kbd> > <kbd>Find Action<kbd> > ide.intellij.laf.enable.animation
+<kbd>Help</kbd> > <kbd>Find Action</kbd> > <kbd>ide.intellij.laf.enable.animation</kbd>
 
 
 #### Preferred Themes
