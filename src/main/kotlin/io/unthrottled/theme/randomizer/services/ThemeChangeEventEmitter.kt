@@ -16,6 +16,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
+@SuppressWarnings("TooManyFunctions")
 class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   private val messageBus = ApplicationManager.getApplication().messageBus.connect()
   private val log = Logger.getInstance(this::class.java)
