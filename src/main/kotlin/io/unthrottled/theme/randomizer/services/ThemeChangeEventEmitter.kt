@@ -16,10 +16,15 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
+@SuppressWarnings("TooManyFunctions")
 class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   private val messageBus = ApplicationManager.getApplication().messageBus.connect()
   private val log = Logger.getInstance(this::class.java)
   private val themeChangeAlarm = Alarm()
+
+  companion object {
+    private const val MAX_CHECK_INTERVAL = 5L
+  }
 
   init {
     val self = this
@@ -51,13 +56,12 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     )
   }
 
-  private fun getDuration(): Long =
-    if (Config.instance.lastChangeTime > -1) {
-      getThemeSwitchCheckInterval()
-    } else {
+  private fun getDuration(): Long {
+    if (Config.instance.lastChangeTime < 0) {
       captureTimestamp()
-      getThemeSwitchCheckInterval()
     }
+    return getThemeSwitchCheckInterval()
+  }
 
   private fun scheduleThemeChange() {
     themeChangeAlarm.addRequest(
@@ -72,18 +76,14 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   private fun getThemeSwitchCheckInterval(): Long =
     getThemeSwitchCheckIntervalFromState(Config.instance)
 
-  @SuppressWarnings("MagicNumber")
   private fun getThemeSwitchCheckIntervalFromState(newPluginState: Config): Long =
-    ChangeIntervals.getValue(newPluginState.interval)
-      .map {
-        when (it) {
-          ChangeIntervals.THIRTY_MINUTES -> 30L
-          ChangeIntervals.WEEK,
-          ChangeIntervals.TWO_DAYS,
-          ChangeIntervals.DAY,
-          ChangeIntervals.HOUR -> 60L
-        }
-      }.orElse(60L)
+    minOf(
+      maxOf(
+        0L,
+        getThemeChangeIntervalInMinutes(newPluginState) - getDurationSinceThemeChange().toMinutes()
+      ),
+      MAX_CHECK_INTERVAL
+    )
 
   override fun dispose() {
     messageBus.dispose()
@@ -93,7 +93,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   private var themeSet = LafManager.getInstance().currentLookAndFeel
 
   override fun run() {
-    if (Config.instance.isChangeTheme.not() || isTime().not()) return
+    if (Config.instance.isChangeTheme.not() || isTime(Config.instance).not()) return
 
     val nextTheme = if (Config.instance.isRandomOrder) {
       ThemeService.instance.getRandomTheme()
@@ -112,16 +112,17 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     scheduleThemeChange()
   }
 
-  private fun isTime(): Boolean {
-    return getThemeChangeIntervalInMinutes() <= Duration.between(
-      Instant.ofEpochSecond(Config.instance.lastChangeTime),
-      Instant.now()
-    ).toMinutes()
-  }
+  private fun isTime(config: Config): Boolean =
+    getThemeChangeIntervalInMinutes(config) <= getDurationSinceThemeChange().toMinutes()
+
+  private fun getDurationSinceThemeChange() = Duration.between(
+    Instant.ofEpochSecond(Config.instance.lastChangeTime),
+    Instant.now()
+  )
 
   @SuppressWarnings("MagicNumber")
-  private fun getThemeChangeIntervalInMinutes(): Long {
-    return ChangeIntervals.getValue(Config.instance.interval)
+  private fun getThemeChangeIntervalInMinutes(config: Config): Long =
+    ChangeIntervals.getValue(config.interval)
       .map {
         when (it) {
           ChangeIntervals.THIRTY_MINUTES -> 30L
@@ -129,9 +130,9 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
           ChangeIntervals.DAY -> 1440L
           ChangeIntervals.TWO_DAYS -> 2880L
           ChangeIntervals.WEEK -> 10080L
+          else -> 60L
         }
       }.orElse(60L)
-  }
 
   private fun captureTimestamp() {
     Config.instance.lastChangeTime = Instant.now().epochSecond

@@ -2,6 +2,10 @@
 
 # Theme Randomizer Changelog
 
+# 0.1.1
+
+- Themes will change at a more correct time when resuming code editing after your computer was suspended.
+
 # 0.1.0
 
 - **Initial Release!!!** Please see the <a href="https://github.com/Unthrottled/theme-randomizer#configuration">
