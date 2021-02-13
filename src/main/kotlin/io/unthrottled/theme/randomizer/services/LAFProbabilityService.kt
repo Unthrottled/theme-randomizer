@@ -1,9 +1,11 @@
 package io.unthrottled.theme.randomizer.services
 
 import com.intellij.ide.IdeEventQueue
+import com.intellij.ide.ui.LafManager
+import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import io.unthrottled.theme.randomizer.listeners.ThemeChangedListener
+import io.unthrottled.theme.randomizer.tools.AlarmDebouncer
 import io.unthrottled.theme.randomizer.tools.ProbabilityTools
 import java.util.Optional
 import java.util.concurrent.TimeUnit
@@ -13,19 +15,27 @@ import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.random.Random
 
-class LAFProbabilityService : Disposable, ThemeChangedListener, Runnable {
+class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
 
   companion object {
     val instance: LAFProbabilityService
       get() = ApplicationManager.getApplication().getService(LAFProbabilityService::class.java)
 
     private const val DEFAULT_IDLE_TIMEOUT_IN_MINUTES = 5L
+    private const val THEME_DEBOUNCE_DURATION_IN_MINUTES = 2L
   }
+
+  private val debouncer = AlarmDebouncer<UIManager.LookAndFeelInfo>(
+    TimeUnit.MILLISECONDS.convert(
+      THEME_DEBOUNCE_DURATION_IN_MINUTES,
+      TimeUnit.MINUTES
+    ).toInt()
+  )
 
   private val messageBusConnection = ApplicationManager.getApplication().messageBus.connect()
 
   init {
-    messageBusConnection.subscribe(ThemeChangedListener.TOPIC, this)
+    messageBusConnection.subscribe(LafManagerListener.TOPIC, this)
     IdeEventQueue.getInstance().addIdleListener(
       this,
       TimeUnit.MILLISECONDS.convert(
@@ -72,7 +82,7 @@ class LAFProbabilityService : Disposable, ThemeChangedListener, Runnable {
     IdeEventQueue.getInstance().removeIdleListener(this)
   }
 
-  override fun onChanged(lookAndFeelInfo: UIManager.LookAndFeelInfo) {
+  private fun onChanged(lookAndFeelInfo: UIManager.LookAndFeelInfo) {
     val themeId = lookAndFeelInfo.getId()
     seenAssetLedger.assetSeenCounts[themeId] =
       getAssetSeenCount(themeId) + 1
@@ -90,6 +100,13 @@ class LAFProbabilityService : Disposable, ThemeChangedListener, Runnable {
     val updatedLedger = ThemeObservationService.persistLedger(seenAssetLedger)
     updatedLedger.assetSeenCounts.forEach { (assetId, assetSeenCount) ->
       seenAssetLedger.assetSeenCounts[assetId] = assetSeenCount
+    }
+  }
+
+  override fun lookAndFeelChanged(source: LafManager) {
+    val currentTheme = source.currentLookAndFeel
+    debouncer.debounce {
+      onChanged(currentTheme)
     }
   }
 }

@@ -12,7 +12,6 @@ import io.unthrottled.theme.randomizer.config.ChangeIntervals
 import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ConfigListener
 import io.unthrottled.theme.randomizer.config.ConfigListener.Companion.CONFIG_TOPIC
-import io.unthrottled.theme.randomizer.listeners.ThemeChangedListener
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -120,8 +119,6 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
         true
       )
       captureTimestamp()
-      ApplicationManager.getApplication().messageBus
-        .syncPublisher(ThemeChangedListener.TOPIC)
     }
     scheduleThemeChange()
   }
