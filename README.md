@@ -1,8 +1,8 @@
 # Theme Randomizer
 
 ![Build](https://github.com/Unthrottled/theme-randomizer/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/16107.svg)](https://plugins.jetbrains.com/plugin/16107)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/16107.svg)](https://plugins.jetbrains.com/plugin/16107)
 
 <!-- Plugin description -->
 Do you have many themes installed? Do you have many favorite themes? Would you like to be able randomly set your theme?
