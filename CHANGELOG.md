@@ -2,6 +2,11 @@
 
 # Theme Randomizer Changelog
 
+# 0.1.3
+
+- Enhanced random theme distribution logic.
+  - Plugin will remember themes you manually set and pick accordinly so you see a theme you haven't seen in a while.
+
 # 0.1.2
 
 - Themes will _actually_ change at a more correct time when resuming code editing after your computer was suspended.
