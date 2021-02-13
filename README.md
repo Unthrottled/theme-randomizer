@@ -15,8 +15,7 @@ line. You can also customize the interval when your theme changes as well!
 
 - Using IDE built-in plugin system:
 
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "
-  theme-randomizer"</kbd> >
+  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "Theme Randomizer"</kbd> >
   <kbd>Install Plugin</kbd>
 
 - Manually:
