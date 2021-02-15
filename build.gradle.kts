@@ -46,7 +46,7 @@ dependencies {
   implementation("commons-io:commons-io:2.6")
   implementation("io.sentry:sentry:4.1.0")
   testImplementation("org.assertj:assertj-core:3.19.0")
-  testImplementation("io.mockk:mockk:1.10.5")
+  testImplementation("io.mockk:mockk:1.10.6")
 }
 
 configurations {
