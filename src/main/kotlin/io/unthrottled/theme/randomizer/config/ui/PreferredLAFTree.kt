@@ -21,6 +21,7 @@ import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.tree.TreeUtil
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.awt.BorderLayout
+import java.awt.EventQueue
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.LinkedList
@@ -61,7 +62,11 @@ class PreferredLAFTree(
     )
     component.add(toolbarPanel, BorderLayout.NORTH)
     component.add(scrollPane, BorderLayout.CENTER)
-    myFilter.reset()
+
+    if(EventQueue.isDispatchThread()) {
+      myFilter.reset()
+    }
+
     reset(copyAndSort(getThemeList()))
   }
 
