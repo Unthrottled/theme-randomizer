@@ -1,4 +1,4 @@
-package io.unthrottled.theme.randomizer
+package io.unthrottled.theme.randomizer.onboarding
 
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
@@ -21,8 +21,7 @@ private val UPDATE_MESSAGE: String =
   """
       What's New?<br>
       <ul>
-        <li>Initial Release! See the <a href="https://github.com/Unthrottled/theme-randomizer#configuration">
-      documentation</a> for features, usages, and configurations.</li>
+          <li>Fixed Search Everywhere settings bug.</li>
       </ul>
       <br>Please see the <a href="https://github.com/Unthrottled/theme-randomizer/blob/master/CHANGELOG.md">changelog</a> for more details.
       Thanks for downloading!
