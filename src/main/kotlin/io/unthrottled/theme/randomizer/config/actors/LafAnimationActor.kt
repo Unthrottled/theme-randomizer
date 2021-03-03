@@ -2,7 +2,7 @@ package io.unthrottled.theme.randomizer.config.actors
 
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.util.registry.RegistryValue
-import io.unthrottled.theme.randomizer.UpdateNotification
+import io.unthrottled.theme.randomizer.onboarding.UpdateNotification
 import io.unthrottled.theme.randomizer.tools.toOptional
 
 object LafAnimationActor {

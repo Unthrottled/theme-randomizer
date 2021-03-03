@@ -63,7 +63,7 @@ class PreferredLAFTree(
     component.add(toolbarPanel, BorderLayout.NORTH)
     component.add(scrollPane, BorderLayout.CENTER)
 
-    if(EventQueue.isDispatchThread()) {
+    if (EventQueue.isDispatchThread()) {
       myFilter.reset()
     }
 

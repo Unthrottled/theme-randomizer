@@ -4,7 +4,6 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupManager
-import io.unthrottled.theme.randomizer.UpdateNotification
 import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.Constants.PLUGIN_ID
 import io.unthrottled.theme.randomizer.tools.toOptional
