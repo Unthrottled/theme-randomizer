@@ -4,6 +4,9 @@
 exceptions:
   TooGenericExceptionCaught:
     active: false
+  SwallowedException:
+    active: false
+
 
 formatting:
   Indentation:
