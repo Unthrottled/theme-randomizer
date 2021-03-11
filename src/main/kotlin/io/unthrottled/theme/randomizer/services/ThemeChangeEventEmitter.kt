@@ -6,7 +6,6 @@ import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.Alarm
 import io.unthrottled.theme.randomizer.config.ChangeIntervals
 import io.unthrottled.theme.randomizer.config.Config
@@ -19,7 +18,6 @@ import java.util.concurrent.TimeUnit
 @SuppressWarnings("TooManyFunctions")
 class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   private val messageBus = ApplicationManager.getApplication().messageBus.connect()
-  private val log = Logger.getInstance(this::class.java)
   private val themeChangeAlarm = Alarm()
 
   companion object {
