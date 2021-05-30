@@ -21,6 +21,7 @@ private val UPDATE_MESSAGE: String =
   """
       What's New?<br>
       <ul>
+          <li>2021.2 Build Support!</li>
           <li>Fixed Search Everywhere settings bug.</li>
       </ul>
       <br>Please see the <a href="https://github.com/Unthrottled/theme-randomizer/blob/master/CHANGELOG.md">changelog</a> for more details.
@@ -43,10 +44,10 @@ object UpdateNotification {
     newVersion: String
   ) {
     val updateNotification = notificationGroup.createNotification(
-      "$PLUGIN_NAME updated to v$newVersion",
       UPDATE_MESSAGE,
       NotificationType.INFORMATION
     )
+      .setTitle("$PLUGIN_NAME updated to v$newVersion")
       .setIcon(PLUGIN_ICON)
       .setListener(NotificationListener.UrlOpeningListener(false))
 
@@ -72,13 +73,14 @@ object UpdateNotification {
     title: String = "",
     content: String,
     project: Project? = null,
-    listener: NotificationListener? = defaultListener
+    listener: NotificationListener = defaultListener
   ) {
     notificationGroup.createNotification(
-      title,
-      content,
-      listener = listener
-    ).setIcon(PLUGIN_ICON)
+      content, NotificationType.INFORMATION
+    )
+      .setTitle(title)
+      .setIcon(PLUGIN_ICON)
+      .setListener(listener)
       .notify(project)
   }
 
