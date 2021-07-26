@@ -22,10 +22,10 @@ import com.intellij.util.ui.tree.TreeUtil
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.awt.BorderLayout
 import java.awt.EventQueue
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.LinkedList
+import java.util.function.Consumer
 import java.util.function.Predicate
+import java.util.stream.Stream
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTree
@@ -173,6 +173,20 @@ class PreferredLAFTree(
     myFilter.dispose()
   }
 
+  fun forEach(nodeConsumer: Consumer<CheckedTreeNode>) {
+    traverseTree(root) {
+      nodeConsumer.accept(it)
+    }
+  }
+
+  public fun getAllNodes(): Stream<CheckedTreeNode> {
+    val bob = Stream.builder<CheckedTreeNode>()
+    traverseTree(root) {
+      bob.add(it)
+    }
+    return bob.build()
+  }
+
   var filter: String?
     get() = myFilter.filter
     set(filter) {
@@ -248,22 +262,28 @@ class PreferredLAFTree(
       }
 
     private fun getSelectedCharacters(root: CheckedTreeNode): List<UIManager.LookAndFeelInfo> {
-      val visitQueue = LinkedList<CheckedTreeNode>()
-      visitQueue.push(root)
       val selectedThemes = LinkedList<UIManager.LookAndFeelInfo>()
-      while (visitQueue.isNotEmpty()) {
-        val current = visitQueue.pop()
-        val userObject = current.userObject
-        if (current.isChecked && userObject is UIManager.LookAndFeelInfo) {
+      traverseTree(root) {
+        val userObject = it.userObject
+        if (it.isChecked && userObject is UIManager.LookAndFeelInfo) {
           selectedThemes.push(userObject)
         }
+      }
+      return selectedThemes
+    }
+
+    private fun traverseTree(root: CheckedTreeNode, consumer: (CheckedTreeNode) -> Unit) {
+      val visitQueue = LinkedList<CheckedTreeNode>()
+      visitQueue.push(root)
+      while (visitQueue.isNotEmpty()) {
+        val current = visitQueue.pop()
+        consumer(current)
         val currentChildren = current.children()
         while (currentChildren.hasMoreElements()) {
           val child = currentChildren.nextElement() as CheckedTreeNode
           visitQueue.push(child)
         }
       }
-      return selectedThemes
     }
 
     private fun isModified(
