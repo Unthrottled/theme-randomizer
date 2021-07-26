@@ -24,6 +24,9 @@ class ThemeGatekeeper : Disposable {
   private var preferredThemeIds: Set<String> =
     extractAllowedCharactersFromState(Config.instance.selectedThemes)
 
+  private var blackListedThemeIds: Set<String> =
+    extractAllowedCharactersFromState(Config.instance.blacklistedThemes)
+
   private fun extractAllowedCharactersFromState(characterConfig: String): Set<String> =
     characterConfig.split(Config.DEFAULT_DELIMITER)
       .filter { it.isNotEmpty() }
@@ -34,15 +37,22 @@ class ThemeGatekeeper : Disposable {
       CONFIG_TOPIC,
       ConfigListener { newPluginState ->
         preferredThemeIds = extractAllowedCharactersFromState(newPluginState.selectedThemes)
+        blackListedThemeIds = extractAllowedCharactersFromState(newPluginState.blacklistedThemes)
       }
     )
   }
 
   fun isLegit(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
-    preferredThemeIds.isEmpty() || isPreferred(lookAndFeelInfo)
+    !isBlackListed(lookAndFeelInfo) &&
+      (preferredThemeIds.isEmpty() || isPreferred(lookAndFeelInfo))
 
   fun isPreferred(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
     preferredThemeIds.contains(
+      lookAndFeelInfo.getId()
+    )
+
+  fun isBlackListed(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
+    blackListedThemeIds.contains(
       lookAndFeelInfo.getId()
     )
 

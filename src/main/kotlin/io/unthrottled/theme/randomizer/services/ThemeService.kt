@@ -39,11 +39,10 @@ class ThemeService : Disposable {
             if (themeIndex > -1) themeIndex + 1 else abs(
               Collections.binarySearch(
                 themes,
-                currentLookAndFeel,
-                { themeOne, themeTwo ->
-                  themeOne.name.compareTo(themeTwo.name)
-                }
-              ) + 1
+                currentLookAndFeel
+              ) { themeOne, themeTwo ->
+                themeOne.name.compareTo(themeTwo.name)
+              } + 1
             )
             ) % it.size
         ]

@@ -40,7 +40,9 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JComboBox<IntervalTuple> changeIntervalWomboComboBox;
   private JCheckBox animationCheckbox;
   private JTabbedPane preferredThemesTabbo;
+  private JPanel blackListPane;
   private LAFListPanel lafListPanelModel;
+  private LAFListPanel blackListPanelModel;
 
   private void createUIComponents() {
     lafListPanelModel = new LAFListPanel(
@@ -50,6 +52,12 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     lafListPane.setPreferredSize(JBUI.size(800, 600));
     lafListPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+    blackListPanelModel = new LAFListPanel(
+      ThemeGatekeeper.Companion.getInstance()::isBlackListed
+    );
+    blackListPane = blackListPanelModel.getComponent();
+    blackListPane.setPreferredSize(JBUI.size(800, 600));
+    blackListPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
   }
 
   @Override
@@ -110,7 +118,8 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   @Override
   public boolean isModified() {
     return !initialSettings.equals(pluginSettingsModel) ||
-      lafListPanelModel.isModified();
+      lafListPanelModel.isModified() ||
+      blackListPanelModel.isModified();
   }
 
   @Override
@@ -120,6 +129,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     config.setChangeTheme(pluginSettingsModel.isChangeTheme());
     config.setRandomOrder(pluginSettingsModel.isRandomOrder());
     config.setSelectedThemes(convertToStorageString(lafListPanelModel));
+    config.setBlacklistedThemes(convertToStorageString(blackListPanelModel));
     LafAnimationActor.INSTANCE.enableAnimation(pluginSettingsModel.isThemeTransition());
     ApplicationManager.getApplication().getMessageBus().syncPublisher(
       ConfigListener.Companion.getCONFIG_TOPIC()

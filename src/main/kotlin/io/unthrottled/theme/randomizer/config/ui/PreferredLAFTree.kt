@@ -49,6 +49,7 @@ class PreferredLAFTree(
   private val myTree: CheckboxTree = createTree()
   private val myFilter: FilterComponent = MyFilterComponent()
   private val toolbarPanel: JPanel = JPanel(BorderLayout())
+  private val myToggleAll = JBCheckBox()
 
   private fun initTree() {
     val scrollPane = ScrollPaneFactory.createScrollPane(myTree)
@@ -63,22 +64,17 @@ class PreferredLAFTree(
       ActionManager.getInstance().createActionToolbar("PreferredCharacterTree", group, true).component,
       BorderLayout.WEST
     )
-    val toggleAll = JBCheckBox()
-    toggleAll.isSelected = getAllNodes()
-      .map { node: CheckedTreeNode -> node.isChecked }
-      .reduce { a: Boolean, b: Boolean ->
-        a && b
-      }
-      .orElse(false)
-    toggleAll.text = MyBundle.message("settings.general.preferred-themes.toggle-all")
-    toggleAll.addActionListener {
+
+    initToggleAll()
+    myToggleAll.text = MyBundle.message("settings.general.preferred-themes.toggle-all")
+    myToggleAll.addActionListener {
       ApplicationManager.getApplication().invokeLater {
         forEach { node ->
-          node.isChecked = toggleAll.isSelected
+          node.isChecked = myToggleAll.isSelected
         }
       }
     }
-    toolbarPanel.add(toggleAll, BorderLayout.EAST)
+    toolbarPanel.add(myToggleAll, BorderLayout.EAST)
 
     component.add(toolbarPanel, BorderLayout.NORTH)
     component.add(scrollPane, BorderLayout.CENTER)
@@ -88,6 +84,16 @@ class PreferredLAFTree(
     }
 
     reset(copyAndSort(getThemeList()))
+    initToggleAll()
+  }
+
+  private fun initToggleAll() {
+    myToggleAll.isSelected = getAllNodes()
+      .map { node: CheckedTreeNode -> node.isChecked }
+      .reduce { a: Boolean, b: Boolean ->
+        a && b
+      }
+      .orElse(false)
   }
 
   private fun createTree() =
