@@ -36,6 +36,10 @@
         <keyboard-shortcut keymap="$default" first-keystroke="shift alt S"/>
       </action>
     </group>
+    <action id="io.unthrottled.theme.randomizer.next-theme" class="io.unthrottled.theme.randomizer.actions.NextTheme"
+            text="Next Theme" description="Picks the next theme to use based on your preferences.">
+      <add-to-group group-id="ThemeRandomizerActions" anchor="after" relative-to-action="theme.randomizer.settings"/>
+    </action>
   </actions>
 
 </idea-plugin>

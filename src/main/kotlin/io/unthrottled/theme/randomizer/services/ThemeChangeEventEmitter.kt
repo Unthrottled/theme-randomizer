@@ -106,18 +106,16 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   override fun run() {
     if (Config.instance.isChangeTheme.not() || isTime(Config.instance).not()) return
 
-    val nextTheme = if (Config.instance.isRandomOrder) {
-      ThemeService.instance.getRandomTheme()
-    } else ThemeService.instance.getNextTheme()
-    nextTheme.ifPresent {
-      themeSet = it
-      QuickChangeLookAndFeel.switchLafAndUpdateUI(
-        LafManager.getInstance(),
-        it,
-        true
-      )
-      captureTimestamp()
-    }
+    ThemeService.instance.nextTheme()
+      .ifPresent {
+        QuickChangeLookAndFeel.switchLafAndUpdateUI(
+          LafManager.getInstance(),
+          it,
+          true
+        )
+        themeSet = it
+        captureTimestamp()
+      }
     scheduleThemeChange()
   }
 

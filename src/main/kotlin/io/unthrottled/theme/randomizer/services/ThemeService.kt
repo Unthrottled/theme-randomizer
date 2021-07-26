@@ -3,6 +3,7 @@ package io.unthrottled.theme.randomizer.services
 import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.ServiceManager
+import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.util.Collections
 import java.util.Optional
@@ -15,16 +16,18 @@ class ThemeService : Disposable {
       get() = ServiceManager.getService(ThemeService::class.java)
   }
 
-  fun getRandomTheme(): Optional<UIManager.LookAndFeelInfo> =
-    LAFProbabilityService.instance.pickAssetFromList(
-      getPreferredThemes()
+  private fun getRandomTheme(): Optional<UIManager.LookAndFeelInfo> {
+    val currentLaf = LafManager.getInstance().currentLookAndFeel
+    return LAFProbabilityService.instance.pickAssetFromList(
+      getPreferredThemes().filter { it.getId() != currentLaf.getId() }
     )
+  }
 
   private fun getPreferredThemes() =
     LafManager.getInstance().installedLookAndFeels
       .filter { ThemeGatekeeper.instance.isLegit(it) }
 
-  fun getNextTheme(): Optional<UIManager.LookAndFeelInfo> {
+  private fun pickNextTheme(): Optional<UIManager.LookAndFeelInfo> {
     val themes = getPreferredThemes().sortedBy { it.name }
     val currentLookAndFeel = LafManager.getInstance().currentLookAndFeel
     val themeIndex = themes.indexOfLast {
@@ -39,11 +42,10 @@ class ThemeService : Disposable {
             if (themeIndex > -1) themeIndex + 1 else abs(
               Collections.binarySearch(
                 themes,
-                currentLookAndFeel,
-                { themeOne, themeTwo ->
-                  themeOne.name.compareTo(themeTwo.name)
-                }
-              ) + 1
+                currentLookAndFeel
+              ) { themeOne, themeTwo ->
+                themeOne.name.compareTo(themeTwo.name)
+              } + 1
             )
             ) % it.size
         ]
@@ -51,4 +53,8 @@ class ThemeService : Disposable {
   }
 
   override fun dispose() {}
+  fun nextTheme(): Optional<UIManager.LookAndFeelInfo> =
+    if (Config.instance.isRandomOrder) {
+      getRandomTheme()
+    } else pickNextTheme()
 }

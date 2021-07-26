@@ -8,6 +8,7 @@ import com.intellij.ide.ui.search.SearchUtil
 import com.intellij.ide.ui.search.SearchableOptionsRegistrar
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.packageDependencies.ui.TreeExpansionMonitor
 import com.intellij.ui.CheckboxTree
@@ -16,16 +17,17 @@ import com.intellij.ui.CheckedTreeNode
 import com.intellij.ui.FilterComponent
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.tree.TreeUtil
+import io.unthrottled.theme.randomizer.MyBundle
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.awt.BorderLayout
 import java.awt.EventQueue
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.LinkedList
 import java.util.function.Predicate
+import java.util.stream.Stream
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTree
@@ -38,6 +40,7 @@ data class ThemeData(
   val lookAndFeelInfo: UIManager.LookAndFeelInfo
 )
 
+@Suppress("TooManyFunctions") // cuz I said so.
 class PreferredLAFTree(
   private val selectionPredicate: Predicate<UIManager.LookAndFeelInfo>
 ) {
@@ -46,6 +49,7 @@ class PreferredLAFTree(
   private val myTree: CheckboxTree = createTree()
   private val myFilter: FilterComponent = MyFilterComponent()
   private val toolbarPanel: JPanel = JPanel(BorderLayout())
+  private val myToggleAll = JBCheckBox()
 
   private fun initTree() {
     val scrollPane = ScrollPaneFactory.createScrollPane(myTree)
@@ -60,6 +64,23 @@ class PreferredLAFTree(
       ActionManager.getInstance().createActionToolbar("PreferredCharacterTree", group, true).component,
       BorderLayout.WEST
     )
+
+    myToggleAll.isSelected = getAllNodes()
+      .map { node: CheckedTreeNode -> node.isChecked }
+      .reduce { a: Boolean, b: Boolean ->
+        a && b
+      }
+      .orElse(false)
+    myToggleAll.text = MyBundle.message("settings.general.preferred-themes.toggle-all")
+    myToggleAll.addActionListener {
+      ApplicationManager.getApplication().invokeLater {
+        getAllNodes().forEach { node ->
+          node.isChecked = myToggleAll.isSelected
+        }
+      }
+    }
+    toolbarPanel.add(myToggleAll, BorderLayout.EAST)
+
     component.add(toolbarPanel, BorderLayout.NORTH)
     component.add(scrollPane, BorderLayout.CENTER)
 
@@ -68,6 +89,12 @@ class PreferredLAFTree(
     }
 
     reset(copyAndSort(getThemeList()))
+    myToggleAll.isSelected = getAllNodes()
+      .map { node: CheckedTreeNode -> node.isChecked }
+      .reduce { a: Boolean, b: Boolean ->
+        a && b
+      }
+      .orElse(false)
   }
 
   private fun createTree() =
@@ -173,6 +200,14 @@ class PreferredLAFTree(
     myFilter.dispose()
   }
 
+  private fun getAllNodes(): Stream<CheckedTreeNode> {
+    val bob = Stream.builder<CheckedTreeNode>()
+    traverseTree(root) {
+      bob.add(it)
+    }
+    return bob.build()
+  }
+
   var filter: String?
     get() = myFilter.filter
     set(filter) {
@@ -248,22 +283,28 @@ class PreferredLAFTree(
       }
 
     private fun getSelectedCharacters(root: CheckedTreeNode): List<UIManager.LookAndFeelInfo> {
-      val visitQueue = LinkedList<CheckedTreeNode>()
-      visitQueue.push(root)
       val selectedThemes = LinkedList<UIManager.LookAndFeelInfo>()
-      while (visitQueue.isNotEmpty()) {
-        val current = visitQueue.pop()
-        val userObject = current.userObject
-        if (current.isChecked && userObject is UIManager.LookAndFeelInfo) {
+      traverseTree(root) {
+        val userObject = it.userObject
+        if (it.isChecked && userObject is UIManager.LookAndFeelInfo) {
           selectedThemes.push(userObject)
         }
+      }
+      return selectedThemes
+    }
+
+    private fun traverseTree(root: CheckedTreeNode, consumer: (CheckedTreeNode) -> Unit) {
+      val visitQueue = LinkedList<CheckedTreeNode>()
+      visitQueue.push(root)
+      while (visitQueue.isNotEmpty()) {
+        val current = visitQueue.pop()
+        consumer(current)
         val currentChildren = current.children()
         while (currentChildren.hasMoreElements()) {
           val child = currentChildren.nextElement() as CheckedTreeNode
           visitQueue.push(child)
         }
       }
-      return selectedThemes
     }
 
     private fun isModified(
