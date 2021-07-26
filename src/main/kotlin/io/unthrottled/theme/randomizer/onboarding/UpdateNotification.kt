@@ -21,6 +21,8 @@ private val UPDATE_MESSAGE: String =
   """
       What's New?<br>
       <ul>
+          <li>Added theme blacklist.</li>
+          <li>Added "Next Theme" action.</li>
           <li>2021.2 Build Support!</li>
           <li>Fixed Search Everywhere settings bug.</li>
       </ul>

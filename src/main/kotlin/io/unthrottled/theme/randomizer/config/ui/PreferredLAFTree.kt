@@ -26,7 +26,6 @@ import io.unthrottled.theme.randomizer.tools.toOptional
 import java.awt.BorderLayout
 import java.awt.EventQueue
 import java.util.LinkedList
-import java.util.function.Consumer
 import java.util.function.Predicate
 import java.util.stream.Stream
 import javax.swing.JComponent
@@ -41,6 +40,7 @@ data class ThemeData(
   val lookAndFeelInfo: UIManager.LookAndFeelInfo
 )
 
+@Suppress("TooManyFunctions") // cuz I said so.
 class PreferredLAFTree(
   private val selectionPredicate: Predicate<UIManager.LookAndFeelInfo>
 ) {
@@ -65,11 +65,16 @@ class PreferredLAFTree(
       BorderLayout.WEST
     )
 
-    initToggleAll()
+    myToggleAll.isSelected = getAllNodes()
+      .map { node: CheckedTreeNode -> node.isChecked }
+      .reduce { a: Boolean, b: Boolean ->
+        a && b
+      }
+      .orElse(false)
     myToggleAll.text = MyBundle.message("settings.general.preferred-themes.toggle-all")
     myToggleAll.addActionListener {
       ApplicationManager.getApplication().invokeLater {
-        forEach { node ->
+        getAllNodes().forEach { node ->
           node.isChecked = myToggleAll.isSelected
         }
       }
@@ -84,10 +89,6 @@ class PreferredLAFTree(
     }
 
     reset(copyAndSort(getThemeList()))
-    initToggleAll()
-  }
-
-  private fun initToggleAll() {
     myToggleAll.isSelected = getAllNodes()
       .map { node: CheckedTreeNode -> node.isChecked }
       .reduce { a: Boolean, b: Boolean ->
@@ -197,12 +198,6 @@ class PreferredLAFTree(
 
   fun dispose() {
     myFilter.dispose()
-  }
-
-  private fun forEach(nodeConsumer: Consumer<CheckedTreeNode>) {
-    traverseTree(root) {
-      nodeConsumer.accept(it)
-    }
   }
 
   private fun getAllNodes(): Stream<CheckedTreeNode> {
