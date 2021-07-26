@@ -5,7 +5,6 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.NlsContexts;
-import com.intellij.ui.CheckedTreeNode;
 import com.intellij.util.ui.JBUI;
 import io.unthrottled.theme.randomizer.config.ChangeIntervals;
 import io.unthrottled.theme.randomizer.config.Config;
@@ -40,7 +39,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JCheckBox randomOrderCheckbox;
   private JComboBox<IntervalTuple> changeIntervalWomboComboBox;
   private JCheckBox animationCheckbox;
-  private JCheckBox toggleAllCheckBox;
+  private JTabbedPane preferredThemesTabbo;
   private LAFListPanel lafListPanelModel;
 
   private void createUIComponents() {
@@ -87,16 +86,6 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
         ((IntervalTuple) changeIntervalWomboComboBox.getModel().getSelectedItem())
           .getInterval().toString()));
 
-    toggleAllCheckBox.setSelected(
-      lafListPanelModel.stream()
-        .map(CheckedTreeNode::isChecked)
-        .reduce(Boolean::logicalAnd)
-        .orElse(false)
-    );
-
-    toggleAllCheckBox.addActionListener(e ->
-      lafListPanelModel.forEach(node -> node.setChecked(toggleAllCheckBox.isSelected()))
-    );
 
     changeThemeCheckbox.setSelected(initialSettings.isChangeTheme());
     changeThemeCheckbox.addActionListener(e ->

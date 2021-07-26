@@ -8,6 +8,7 @@ import com.intellij.ide.ui.search.SearchUtil
 import com.intellij.ide.ui.search.SearchableOptionsRegistrar
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.packageDependencies.ui.TreeExpansionMonitor
 import com.intellij.ui.CheckboxTree
@@ -16,9 +17,11 @@ import com.intellij.ui.CheckedTreeNode
 import com.intellij.ui.FilterComponent
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.tree.TreeUtil
+import io.unthrottled.theme.randomizer.MyBundle
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.awt.BorderLayout
 import java.awt.EventQueue
@@ -60,6 +63,23 @@ class PreferredLAFTree(
       ActionManager.getInstance().createActionToolbar("PreferredCharacterTree", group, true).component,
       BorderLayout.WEST
     )
+    val toggleAll = JBCheckBox()
+    toggleAll.isSelected = getAllNodes()
+      .map { node: CheckedTreeNode -> node.isChecked }
+      .reduce { a: Boolean, b: Boolean ->
+        a && b
+      }
+      .orElse(false)
+    toggleAll.text = MyBundle.message("settings.general.preferred-themes.toggle-all")
+    toggleAll.addActionListener {
+      ApplicationManager.getApplication().invokeLater {
+        forEach { node ->
+          node.isChecked = toggleAll.isSelected
+        }
+      }
+    }
+    toolbarPanel.add(toggleAll, BorderLayout.EAST)
+
     component.add(toolbarPanel, BorderLayout.NORTH)
     component.add(scrollPane, BorderLayout.CENTER)
 
@@ -173,13 +193,13 @@ class PreferredLAFTree(
     myFilter.dispose()
   }
 
-  fun forEach(nodeConsumer: Consumer<CheckedTreeNode>) {
+  private fun forEach(nodeConsumer: Consumer<CheckedTreeNode>) {
     traverseTree(root) {
       nodeConsumer.accept(it)
     }
   }
 
-  public fun getAllNodes(): Stream<CheckedTreeNode> {
+  private fun getAllNodes(): Stream<CheckedTreeNode> {
     val bob = Stream.builder<CheckedTreeNode>()
     traverseTree(root) {
       bob.add(it)

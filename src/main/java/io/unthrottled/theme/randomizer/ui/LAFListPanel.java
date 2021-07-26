@@ -1,6 +1,5 @@
 package io.unthrottled.theme.randomizer.ui;
 
-import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.GuiUtils;
 import io.unthrottled.theme.randomizer.config.ui.PreferredLAFTree;
 
@@ -8,9 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public final class LAFListPanel {
   private final PreferredLAFTree myLAFTree;
@@ -33,13 +30,6 @@ public final class LAFListPanel {
 
   public List<UIManager.LookAndFeelInfo> getSelected() {
     return myLAFTree.getSelected();
-  }
-
-  public void forEach(Consumer<CheckedTreeNode> nodeConsumer) {
-    myLAFTree.forEach(nodeConsumer);
-  }
-  public Stream<CheckedTreeNode> stream() {
-    return myLAFTree.getAllNodes();
   }
 
   public JPanel getComponent() {
