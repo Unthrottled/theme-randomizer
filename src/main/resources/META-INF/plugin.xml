@@ -17,6 +17,7 @@
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.PluginMaster"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.ThemeGatekeeper"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.ThemeService"/>
+    <notificationGroup displayType="BALLOON" id="Theme Randomizer Updates" toolWindowId="Theme Randomizer Updates" icon="ThemeRandomizerIcons.PLUGIN_ICON" isLogByDefault="false" />
     <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
   </extensions>
 
