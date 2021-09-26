@@ -1,8 +1,7 @@
 package io.unthrottled.theme.randomizer.onboarding
 
 import com.intellij.notification.Notification
-import com.intellij.notification.NotificationDisplayType
-import com.intellij.notification.NotificationGroup
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.impl.NotificationsManagerImpl
@@ -21,10 +20,7 @@ private val UPDATE_MESSAGE: String =
   """
       What's New?<br>
       <ul>
-          <li>Added theme blacklist.</li>
-          <li>Added "Next Theme" action.</li>
-          <li>2021.2 Build Support!</li>
-          <li>Fixed Search Everywhere settings bug.</li>
+          <li>2021.3 Build Support!</li>
       </ul>
       <br>Please see the <a href="https://github.com/Unthrottled/theme-randomizer/blob/master/CHANGELOG.md">changelog</a> for more details.
       Thanks for downloading!
@@ -34,12 +30,8 @@ private val UPDATE_MESSAGE: String =
 object UpdateNotification {
 
   private const val UPDATE_CHANNEL_NAME = "$PLUGIN_NAME Updates"
-  private val notificationGroup = NotificationGroup(
-    UPDATE_CHANNEL_NAME,
-    NotificationDisplayType.STICKY_BALLOON,
-    false,
-    UPDATE_CHANNEL_NAME
-  )
+  private val notificationGroup = NotificationGroupManager.getInstance()
+    .getNotificationGroup(UPDATE_CHANNEL_NAME)
 
   fun display(
     project: Project,
