@@ -20,7 +20,7 @@ private val UPDATE_MESSAGE: String =
   """
       What's New?<br>
       <ul>
-          <li>2021.3 Build Support!</li>
+          <li>2022.1 Build Support!</li>
       </ul>
       <br>Please see the <a href="https://github.com/Unthrottled/theme-randomizer/blob/master/CHANGELOG.md">changelog</a> for more details.
       Thanks for downloading!

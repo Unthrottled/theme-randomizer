@@ -23,6 +23,7 @@ import io.sentry.protocol.Message
 import io.sentry.protocol.User
 import io.unthrottled.amii.integrations.RestClient
 import io.unthrottled.theme.randomizer.config.Config
+import io.unthrottled.theme.randomizer.tools.runSafely
 import java.awt.Component
 import java.lang.management.ManagementFactory
 import java.text.SimpleDateFormat
@@ -33,13 +34,6 @@ import java.util.stream.Collectors
 class ErrorReporter : ErrorReportSubmitter() {
   companion object {
     init {
-      Sentry.init { options: SentryOptions ->
-        options.dsn = RestClient.performGet(
-          "https://jetbrains.assets.unthrottled.io/theme-randomizer/sentry-dsn.txt"
-        )
-          .map { it.trim() }
-          .orElse("https://684f3bc69f2f4e6ba04229232f1a0cae@o403546.ingest.sentry.io/5604960?maxmessagelength=50000")
-      }
       Sentry.setUser(
         User().apply {
           this.id = Config.instance.userId
@@ -60,6 +54,18 @@ class ErrorReporter : ErrorReportSubmitter() {
   ): Boolean {
     ApplicationManager.getApplication()
       .executeOnPooledThread {
+        runSafely({
+          Sentry.init { options: SentryOptions ->
+            options.dsn = RestClient.performGet(
+              "https://jetbrains.assets.unthrottled.io/theme-randomizer/sentry-dsn.txt"
+            )
+              .map { it.trim() }
+              .orElse(
+                "https://684f3bc69f2f4e6ba04229232f1a0cae" +
+                  "@o403546.ingest.sentry.io/5604960?maxmessagelength=50000"
+              )
+          }
+        }) {}
         events.forEach {
           Sentry.captureEvent(
             addSystemInfo(
