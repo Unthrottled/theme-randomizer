@@ -7,12 +7,14 @@ import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil.copyBean
 import com.intellij.util.xmlb.XmlSerializerUtil.createCopy
 import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor
+import io.unthrottled.theme.randomizer.mode.PluginMode
 
 data class ConfigSettingsModel(
   var interval: String,
   var isChangeTheme: Boolean,
   var isRandomOrder: Boolean,
   var isThemeTransition: Boolean,
+  var pluginMode: PluginMode,
 ) {
   fun duplicate(): ConfigSettingsModel = copy()
 }
@@ -34,6 +36,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
       isChangeTheme = instance.isChangeTheme,
       isRandomOrder = instance.isRandomOrder,
       isThemeTransition = LafAnimationActor.getAnimationEnabled(),
+      pluginMode = PluginMode.valueFrom(instance.pluginMode)
     )
   }
 
@@ -42,9 +45,14 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var isRandomOrder: Boolean = true
   var userId: String = ""
   var version: String = ""
+  var pluginMode: String = PluginMode.TIMED.displayName
   var selectedThemes = ""
   var blacklistedThemes = ""
   var lastChangeTime = -1L
+
+  fun setPluginMode(pluginMode: PluginMode) {
+    this.pluginMode = pluginMode.displayName
+  }
 
   override fun getState(): Config? =
     createCopy(this)
