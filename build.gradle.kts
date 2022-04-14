@@ -103,6 +103,10 @@ tasks {
     jvmTarget = "11"
   }
 
+  runIde {
+    maxHeapSize = "2g"
+  }
+
   patchPluginXml {
     version.set(pluginVersion)
     sinceBuild.set(pluginSinceBuild)

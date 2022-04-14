@@ -13,6 +13,7 @@ import io.unthrottled.theme.randomizer.config.ConfigSettingsModel;
 import io.unthrottled.theme.randomizer.config.IntervalTuple;
 import io.unthrottled.theme.randomizer.config.SettingsHelper;
 import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor;
+import io.unthrottled.theme.randomizer.mode.PluginMode;
 import io.unthrottled.theme.randomizer.services.ThemeGatekeeper;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +42,8 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JCheckBox animationCheckbox;
   private JTabbedPane preferredThemesTabbo;
   private JPanel blackListPane;
+  private JPanel timedSettingsPanel;
+  private JComboBox<PluginMode> pluginModeComboBox;
   private LAFListPanel lafListPanelModel;
   private LAFListPanel blackListPanelModel;
 
@@ -106,6 +109,11 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     animationCheckbox.setSelected(initialSettings.isThemeTransition());
     animationCheckbox.addActionListener(e ->
       pluginSettingsModel.setThemeTransition(animationCheckbox.isSelected()));
+
+    pluginModeComboBox.setModel(new DefaultComboBoxModel<>(PluginMode.values()));
+    pluginModeComboBox.addActionListener(e -> {
+
+    });
 
     return rootPane;
   }
