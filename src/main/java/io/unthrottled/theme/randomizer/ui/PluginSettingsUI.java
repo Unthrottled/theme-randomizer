@@ -25,7 +25,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.SpinnerNumberModel;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -44,7 +46,9 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JPanel blackListPane;
   private JPanel timedSettingsPanel;
   private JComboBox<PluginMode> pluginModeComboBox;
+  private JSpinner systemChangeSpinner;
   private JPanel systemMatchSettingsPanel;
+  private JPanel timedSettingsConfigPanel;
   private LAFListPanel lafListPanelModel;
   private LAFListPanel blackListPanelModel;
 
@@ -111,6 +115,18 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     animationCheckbox.addActionListener(e ->
       pluginSettingsModel.setThemeTransition(animationCheckbox.isSelected()));
 
+    SpinnerNumberModel systemChangeSpinnerModel = new SpinnerNumberModel(
+      initialSettings.getChangeOnSystemSwitches(),
+      0,
+      Integer.MAX_VALUE,
+      1
+    );
+
+    systemChangeSpinner.setModel(systemChangeSpinnerModel);
+    systemChangeSpinner.addChangeListener(change ->
+      pluginSettingsModel.setChangeOnSystemSwitches(systemChangeSpinnerModel.getNumber().intValue()
+    ));
+
     DefaultComboBoxModel<PluginMode> pluginModeModel = new DefaultComboBoxModel<>(PluginMode.values());
     pluginModeModel.setSelectedItem(pluginSettingsModel.getPluginMode());
     setActiveModeDisplay(pluginSettingsModel.getPluginMode());
@@ -125,7 +141,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
 
   private void setActiveModeDisplay(PluginMode currentPluginMode) {
     systemMatchSettingsPanel.setVisible(PluginMode.SYSTEM_MATCH.equals(currentPluginMode));
-    timedSettingsPanel.setVisible(PluginMode.TIMED.equals(currentPluginMode));
+    timedSettingsConfigPanel.setVisible(PluginMode.TIMED.equals(currentPluginMode));
   }
 
   @NotNull
@@ -149,6 +165,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     config.setSelectedThemes(convertToStorageString(lafListPanelModel));
     config.setBlacklistedThemes(convertToStorageString(blackListPanelModel));
     config.setPluginMode(pluginSettingsModel.getPluginMode());
+    config.setChangeOnSystemSwitches(pluginSettingsModel.getChangeOnSystemSwitches());
     LafAnimationActor.INSTANCE.enableAnimation(pluginSettingsModel.isThemeTransition());
     ApplicationManager.getApplication().getMessageBus().syncPublisher(
       ConfigListener.Companion.getCONFIG_TOPIC()

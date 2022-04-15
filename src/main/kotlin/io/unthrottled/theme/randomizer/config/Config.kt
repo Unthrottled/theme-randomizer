@@ -15,6 +15,7 @@ data class ConfigSettingsModel(
   var isRandomOrder: Boolean,
   var isThemeTransition: Boolean,
   var pluginMode: PluginMode,
+  var changeOnSystemSwitches: Int,
 ) {
   fun duplicate(): ConfigSettingsModel = copy()
 }
@@ -36,7 +37,8 @@ class Config : PersistentStateComponent<Config>, Cloneable {
       isChangeTheme = instance.isChangeTheme,
       isRandomOrder = instance.isRandomOrder,
       isThemeTransition = LafAnimationActor.getAnimationEnabled(),
-      pluginMode = PluginMode.valueFrom(instance.pluginMode)
+      pluginMode = PluginMode.valueFrom(instance.pluginMode),
+      changeOnSystemSwitches = instance.changeOnSystemSwitches,
     )
   }
 
@@ -49,6 +51,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var selectedThemes = ""
   var blacklistedThemes = ""
   var lastChangeTime = -1L
+  var changeOnSystemSwitches = 1
 
   fun setPluginMode(pluginMode: PluginMode) {
     this.pluginMode = pluginMode.displayName
