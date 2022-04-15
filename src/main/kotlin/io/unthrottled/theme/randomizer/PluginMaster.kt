@@ -7,6 +7,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.project.ProjectManagerListener
 import io.unthrottled.theme.randomizer.onboarding.UserOnBoarding
 import io.unthrottled.theme.randomizer.services.LAFProbabilityService
+import io.unthrottled.theme.randomizer.services.SystemMatchManager
 import io.unthrottled.theme.randomizer.services.ThemeChangeEventEmitter
 import io.unthrottled.theme.randomizer.tools.Logging
 
@@ -19,6 +20,7 @@ class PluginMaster : ProjectManagerListener, Disposable, Logging {
 
   init {
     LAFProbabilityService.instance.toString() // wake up the look and feel probability service
+    SystemMatchManager.init()
   }
 
   private val themeChangeEventEmitter = ThemeChangeEventEmitter()
@@ -36,6 +38,7 @@ class PluginMaster : ProjectManagerListener, Disposable, Logging {
 
   override fun dispose() {
     themeChangeEventEmitter.dispose()
+    SystemMatchManager.dispose()
   }
 
   fun onUpdate() {

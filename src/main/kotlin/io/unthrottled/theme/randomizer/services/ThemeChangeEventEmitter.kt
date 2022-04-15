@@ -12,6 +12,7 @@ import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ConfigListener
 import io.unthrottled.theme.randomizer.config.ConfigListener.Companion.CONFIG_TOPIC
 import io.unthrottled.theme.randomizer.mode.PluginMode
+import io.unthrottled.theme.randomizer.mode.toPluginMode
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -42,7 +43,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
       ConfigListener { newPluginState ->
         themeChangeAlarm.cancelAllRequests()
         if (newPluginState.isChangeTheme &&
-          PluginMode.valueFrom(newPluginState.pluginMode) == PluginMode.TIMED) {
+          newPluginState.pluginMode.toPluginMode() == PluginMode.TIMED) {
           themeChangeAlarm.addRequest(
             self,
             convertMinutesToMillis(

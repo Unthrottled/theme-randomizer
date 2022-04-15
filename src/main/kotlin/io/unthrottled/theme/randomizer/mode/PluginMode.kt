@@ -14,3 +14,6 @@ enum class PluginMode(val displayName: String) {
       nameToPluginMode[pluginMode] ?: TIMED
   }
 }
+
+
+fun String.toPluginMode(): PluginMode = PluginMode.valueFrom(this)

@@ -8,6 +8,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil.copyBean
 import com.intellij.util.xmlb.XmlSerializerUtil.createCopy
 import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor
 import io.unthrottled.theme.randomizer.mode.PluginMode
+import io.unthrottled.theme.randomizer.mode.toPluginMode
 
 data class ConfigSettingsModel(
   var interval: String,
@@ -37,7 +38,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
       isChangeTheme = instance.isChangeTheme,
       isRandomOrder = instance.isRandomOrder,
       isThemeTransition = LafAnimationActor.getAnimationEnabled(),
-      pluginMode = PluginMode.valueFrom(instance.pluginMode),
+      pluginMode = instance.pluginMode.toPluginMode(),
       changeOnSystemSwitches = instance.changeOnSystemSwitches,
     )
   }
@@ -52,6 +53,8 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var blacklistedThemes = ""
   var lastChangeTime = -1L
   var changeOnSystemSwitches = 1
+  var lightSystemObservedCounts = 0
+  var darkSystemObservedCounts = 0
 
   fun setPluginMode(pluginMode: PluginMode) {
     this.pluginMode = pluginMode.displayName
