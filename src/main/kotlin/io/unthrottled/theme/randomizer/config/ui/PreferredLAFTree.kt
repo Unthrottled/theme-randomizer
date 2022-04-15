@@ -4,6 +4,8 @@ import com.intellij.ide.CommonActionsManager
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.ui.LafManager
+import com.intellij.ide.ui.laf.UIThemeBasedLookAndFeelInfo
+import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo
 import com.intellij.ide.ui.search.SearchUtil
 import com.intellij.ide.ui.search.SearchableOptionsRegistrar
 import com.intellij.openapi.actionSystem.ActionManager
@@ -36,15 +38,16 @@ import javax.swing.UIManager
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
 
-data class ThemeData(
-  val lookAndFeelInfo: UIManager.LookAndFeelInfo
+data class ThemeGroupData(
+  val name: String,
+  val lookAndFeels: List<UIManager.LookAndFeelInfo>
 )
 
 @Suppress("TooManyFunctions") // cuz I said so.
 class PreferredLAFTree(
   private val selectionPredicate: Predicate<UIManager.LookAndFeelInfo>
 ) {
-  private val characterCheckStatus: MutableMap<String, Boolean> = HashMap()
+  private val themeCheckStatus: MutableMap<String, Boolean> = HashMap()
   val component: JComponent = JPanel(BorderLayout())
   private val myTree: CheckboxTree = createTree()
   private val myFilter: FilterComponent = MyFilterComponent()
@@ -112,7 +115,7 @@ class PreferredLAFTree(
           if (value !is CheckedTreeNode) return
 
           val attributes =
-            if (value.userObject is ThemeData) SimpleTextAttributes.REGULAR_ATTRIBUTES
+            if (value.userObject is ThemeGroupData) SimpleTextAttributes.REGULAR_ATTRIBUTES
             else SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
           val text = getNodeText(value)
           val background = UIUtil.getTreeBackground(selected, true)
@@ -130,13 +133,13 @@ class PreferredLAFTree(
       CheckedTreeNode(null)
     )
 
-  fun filterModel(filter: String?, force: Boolean): List<ThemeData> {
-    val list: List<ThemeData> = getThemeList()
+  fun filterModel(filter: String?, force: Boolean): List<ThemeGroupData> {
+    val list: List<ThemeGroupData> = getThemeList()
     if (filter.isNullOrEmpty()) {
       return list
     }
 
-    var result: List<ThemeData> =
+    var result: List<ThemeGroupData> =
       getThemeList {
         it.name.contains(filter, ignoreCase = true)
       }
@@ -150,28 +153,44 @@ class PreferredLAFTree(
     return result
   }
 
-  fun filter(intentionsToShow: List<ThemeData>) {
+  fun filter(intentionsToShow: List<ThemeGroupData>) {
     refreshCheckStatus(myTree.model.root as CheckedTreeNode)
     reset(copyAndSort(intentionsToShow))
   }
 
   fun reset() {
-    characterCheckStatus.clear()
+    themeCheckStatus.clear()
     reset(copyAndSort(getThemeList()))
   }
 
   private fun getThemeList(predicate: (UIManager.LookAndFeelInfo) -> Boolean = { true }) =
     LafManager.getInstance().installedLookAndFeels
       .filter(predicate)
-      .map { ThemeData(it) }
-      .sortedBy { it.lookAndFeelInfo.name }
+      .sortedBy { it.name }
+      .groupBy {
+        if(it is UIThemeBasedLookAndFeelInfo) {
+          it.theme.isDark
+        } else {
+          it is DarculaLookAndFeelInfo
+        }
+      }
+      .map {
+        ThemeGroupData(if(it.key) "Dark Themes" else "Light Themes", it.value)
+      }
 
-  private fun reset(sortedThemeData: List<ThemeData>) {
+  private fun reset(sortedThemeData: List<ThemeGroupData>) {
     val root = CheckedTreeNode(null)
     val treeModel = myTree.model as DefaultTreeModel
     sortedThemeData.forEach { themeData ->
-      val themeRoot = CheckedTreeNode(themeData.lookAndFeelInfo)
-      themeRoot.isChecked = selectionPredicate.test(themeData.lookAndFeelInfo)
+      val themeRoot = CheckedTreeNode(themeData.name)
+      themeData.lookAndFeels.forEach { uiLookAndFeel ->
+        val themeNode = CheckedTreeNode(uiLookAndFeel)
+        themeNode.isChecked = selectionPredicate.test(uiLookAndFeel)
+        treeModel.insertNodeInto(themeNode, themeRoot, themeRoot.childCount)
+      }
+      themeRoot.isChecked = themeData.lookAndFeels.all {
+        lookAndFeelInfo -> selectionPredicate.test(lookAndFeelInfo)
+      }
       treeModel.insertNodeInto(themeRoot, root, root.childCount)
     }
     treeModel.setRoot(root)
@@ -184,11 +203,11 @@ class PreferredLAFTree(
     get() = myTree.model.root as CheckedTreeNode
 
   fun getSelected(): List<UIManager.LookAndFeelInfo> =
-    getSelectedCharacters(root)
+    getSelectedThemes(root)
 
   private fun refreshCheckStatus(root: CheckedTreeNode) {
     when (val userObject = root.userObject) {
-      is UIManager.LookAndFeelInfo -> characterCheckStatus[userObject.name] = root.isChecked
+      is UIManager.LookAndFeelInfo -> themeCheckStatus[userObject.name] = root.isChecked
       else -> visitChildren(root) { refreshCheckStatus(it) }
     }
   }
@@ -268,10 +287,10 @@ class PreferredLAFTree(
 
   companion object {
     private const val HISTORY_LENGTH = 10
-    private fun copyAndSort(intentionsToShow: List<ThemeData>): List<ThemeData> {
-      val copy: MutableList<ThemeData> = ArrayList(intentionsToShow)
-      copy.sortWith { data1: ThemeData, data2: ThemeData ->
-        data1.lookAndFeelInfo.name.compareTo(data2.lookAndFeelInfo.name)
+    private fun copyAndSort(intentionsToShow: List<ThemeGroupData>): List<ThemeGroupData> {
+      val copy: MutableList<ThemeGroupData> = ArrayList(intentionsToShow)
+      copy.sortWith { data1: ThemeGroupData, data2: ThemeGroupData ->
+        data1.name.compareTo(data2.name)
       }
       return copy
     }
@@ -279,10 +298,11 @@ class PreferredLAFTree(
     private fun getNodeText(node: CheckedTreeNode): String =
       when (val userObject = node.userObject) {
         is UIManager.LookAndFeelInfo -> userObject.name
+        is String -> userObject
         else -> "???"
       }
 
-    private fun getSelectedCharacters(root: CheckedTreeNode): List<UIManager.LookAndFeelInfo> {
+    private fun getSelectedThemes(root: CheckedTreeNode): List<UIManager.LookAndFeelInfo> {
       val selectedThemes = LinkedList<UIManager.LookAndFeelInfo>()
       traverseTree(root) {
         val userObject = it.userObject
