@@ -14,6 +14,7 @@ import io.unthrottled.theme.randomizer.config.IntervalTuple;
 import io.unthrottled.theme.randomizer.config.SettingsHelper;
 import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor;
 import io.unthrottled.theme.randomizer.mode.PluginMode;
+import io.unthrottled.theme.randomizer.services.SystemMatchManager;
 import io.unthrottled.theme.randomizer.services.ThemeGatekeeper;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +50,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JSpinner systemChangeSpinner;
   private JPanel systemMatchSettingsPanel;
   private JPanel timedSettingsConfigPanel;
+  private JPanel pluginModePanel;
   private LAFListPanel lafListPanelModel;
   private LAFListPanel blackListPanelModel;
 
@@ -135,6 +137,8 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
       setActiveModeDisplay((PluginMode) pluginModeModel.getSelectedItem());
       pluginSettingsModel.setPluginMode((PluginMode)pluginModeModel.getSelectedItem());
     });
+
+    pluginModePanel.setVisible(SystemMatchManager.INSTANCE.isSystemMatchAvailable());
 
     return rootPane;
   }

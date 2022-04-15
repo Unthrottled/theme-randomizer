@@ -30,8 +30,8 @@ object SystemMatchManager: Disposable {
     }
   }
 
-  // todo: don't show system match in settings unless available.
-  fun isSystemMatchAvailable() = lafDetector.value.detectionSupported
+  fun isSystemMatchAvailable() =
+    lafDetector.value.detectionSupported
 
   private fun handleSystemUpdateEvent(systemIsDark: Boolean) {
     if(isSystemMatch().not()) return
