@@ -64,6 +64,7 @@ object SystemMatchManager : Disposable {
 
     val chooseNewTheme = shouldChooseNewTheme(currentSystemType)
 
+    // todo: shouldn't really switch theme if current laf & system match
     if (chooseNewTheme) {
       adjustObservations(currentSystemType)
       ThemeService.instance.nextTheme(currentSystemType.selectableThemeType)
@@ -90,7 +91,7 @@ object SystemMatchManager : Disposable {
   private fun getPreviousThemePropertyKey(systemType: SystemType) =
     when (systemType) {
       SystemType.DARK -> "randomizer.system.match.dark.previous"
-      SystemType.LIGHT -> "randomizer.system.match.dark.previous"
+      SystemType.LIGHT -> "randomizer.system.match.light.previous"
     }
 
   private fun restorePreviousTheme(currentSystemType: SystemType): Optional<UIManager.LookAndFeelInfo> {

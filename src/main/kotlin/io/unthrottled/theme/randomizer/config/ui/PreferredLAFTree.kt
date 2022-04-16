@@ -168,11 +168,7 @@ class PreferredLAFTree(
       .filter(predicate)
       .sortedBy { it.name }
       .groupBy {
-        if (it is UIThemeBasedLookAndFeelInfo) {
-          it.theme.isDark
-        } else {
-          it is DarculaLookAndFeelInfo
-        }
+        it.isDark()
       }
       .map {
         ThemeGroupData(if (it.key) "Dark Themes" else "Light Themes", it.value)
@@ -188,8 +184,7 @@ class PreferredLAFTree(
         themeNode.isChecked = selectionPredicate.test(uiLookAndFeel)
         treeModel.insertNodeInto(themeNode, themeRoot, themeRoot.childCount)
       }
-      themeRoot.isChecked = themeData.lookAndFeels.all {
-        lookAndFeelInfo ->
+      themeRoot.isChecked = themeData.lookAndFeels.all { lookAndFeelInfo ->
         selectionPredicate.test(lookAndFeelInfo)
       }
       treeModel.insertNodeInto(themeRoot, root, root.childCount)
@@ -361,3 +356,10 @@ class PreferredLAFTree(
     initTree()
   }
 }
+
+fun UIManager.LookAndFeelInfo.isDark(): Boolean =
+  if (this is UIThemeBasedLookAndFeelInfo) {
+    this.theme.isDark
+  } else {
+    this is DarculaLookAndFeelInfo
+  }
