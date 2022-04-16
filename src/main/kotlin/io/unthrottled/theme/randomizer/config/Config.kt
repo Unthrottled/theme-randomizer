@@ -53,8 +53,8 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var blacklistedThemes = ""
   var lastChangeTime = -1L
   var changeOnSystemSwitches = 1
-  var lightSystemObservedCounts = 0
-  var darkSystemObservedCounts = 0
+  var lightSystemObservedCounts = -1
+  var darkSystemObservedCounts = -1
 
   fun setPluginMode(pluginMode: PluginMode) {
     this.pluginMode = pluginMode.displayName

@@ -35,7 +35,7 @@ class ThemeGatekeeper : Disposable {
   init {
     connection.subscribe(
       CONFIG_TOPIC,
-      ConfigListener { newPluginState ->
+      ConfigListener { newPluginState, _ ->
         preferredThemeIds = extractAllowedCharactersFromState(newPluginState.selectedThemes)
         blackListedThemeIds = extractAllowedCharactersFromState(newPluginState.blacklistedThemes)
       }

@@ -173,7 +173,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     LafAnimationActor.INSTANCE.enableAnimation(pluginSettingsModel.isThemeTransition());
     ApplicationManager.getApplication().getMessageBus().syncPublisher(
       ConfigListener.Companion.getCONFIG_TOPIC()
-    ).pluginConfigUpdated(config);
+    ).pluginConfigUpdated(config, initialSettings);
     initialSettings = pluginSettingsModel.duplicate();
   }
 

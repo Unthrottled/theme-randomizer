@@ -14,6 +14,10 @@ import io.unthrottled.theme.randomizer.tools.toOptional
 import java.util.Optional
 import javax.swing.UIManager
 
+private enum class SystemStateObservation {
+  CHANGED, SAME,
+}
+
 enum class SystemType(val selectableThemeType: SelectableThemeType) {
   DARK(SelectableThemeType.DARK), LIGHT(SelectableThemeType.LIGHT);
 
@@ -32,10 +36,14 @@ object SystemMatchManager : Disposable {
   init {
     messageBus.subscribe(
       ConfigListener.CONFIG_TOPIC,
-      ConfigListener { newPluginState ->
+      ConfigListener { newPluginState, previousConfig ->
+        val newPluginStateMode = newPluginState.pluginMode.toPluginMode()
         if (newPluginState.isChangeTheme &&
-          newPluginState.pluginMode.toPluginMode() == PluginMode.SYSTEM_MATCH
+          newPluginStateMode == PluginMode.SYSTEM_MATCH
         ) {
+          if(previousConfig.pluginMode != newPluginStateMode) {
+            resetObservationCounts()
+          }
           lafDetector.value.check()
         }
       }
@@ -60,11 +68,12 @@ object SystemMatchManager : Disposable {
   private fun handleSystemUpdateEvent(currentSystemType: SystemType) {
     if (isSystemMatch().not()) return
 
-    observeThemeChange(currentSystemType)
+    val systemStateObservation = observeThemeChange(currentSystemType)
+
+    if (systemStateObservation == SystemStateObservation.SAME) return
 
     val chooseNewTheme = shouldChooseNewTheme(currentSystemType)
 
-    // todo: shouldn't really switch theme if current laf & system match
     if (chooseNewTheme) {
       adjustObservations(currentSystemType)
       ThemeService.instance.nextTheme(currentSystemType.selectableThemeType)
@@ -111,7 +120,7 @@ object SystemMatchManager : Disposable {
       .orElseGet { ThemeService.instance.nextTheme(currentSystemType.selectableThemeType) }
   }
 
-  private fun observeThemeChange(currentSystemType: SystemType) {
+  private fun observeThemeChange(currentSystemType: SystemType): SystemStateObservation {
     val lastObservedThemeKey = "randomizer.system.match.last.observed.system"
     val lastObservedSystemType = SystemType.fromStringValue(
       PropertiesComponent.getInstance().getValue(
@@ -132,6 +141,10 @@ object SystemMatchManager : Disposable {
         lastObservedSystemType.toString()
       )
     }
+    val didSystemTypeChange = lastObservedSystemType == null ||
+      lastObservedSystemType != currentSystemType
+    return if (didSystemTypeChange) SystemStateObservation.CHANGED
+    else SystemStateObservation.SAME
   }
 
   private fun shouldChooseNewTheme(currentSystemType: SystemType): Boolean =
@@ -145,6 +158,11 @@ object SystemMatchManager : Disposable {
           Config.instance.changeOnSystemSwitches
       }
     }
+
+  private fun resetObservationCounts() {
+    Config.instance.lightSystemObservedCounts = -1
+    Config.instance.darkSystemObservedCounts = -1
+  }
 
   private fun adjustObservations(currentSystemType: SystemType) {
     when (currentSystemType) {

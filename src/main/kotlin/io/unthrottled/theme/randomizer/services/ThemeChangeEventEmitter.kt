@@ -40,7 +40,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     val self = this
     messageBus.subscribe(
       CONFIG_TOPIC,
-      ConfigListener { newPluginState ->
+      ConfigListener { newPluginState, _ ->
         themeChangeAlarm.cancelAllRequests()
         if (newPluginState.isChangeTheme &&
           newPluginState.pluginMode.toPluginMode() == PluginMode.TIMED

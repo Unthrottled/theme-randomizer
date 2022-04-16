@@ -8,5 +8,8 @@ fun interface ConfigListener : EventListener {
     val CONFIG_TOPIC: Topic<ConfigListener> =
       Topic(ConfigListener::class.java)
   }
-  fun pluginConfigUpdated(config: Config)
+  fun pluginConfigUpdated(
+    config: Config,
+    previousConfig: ConfigSettingsModel
+  )
 }
