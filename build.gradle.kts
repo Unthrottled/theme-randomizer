@@ -43,7 +43,7 @@ repositories {
   mavenLocal()
 }
 dependencies {
-  detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0")
+  detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0")
   implementation("commons-io:commons-io:2.11.0")
   implementation("io.sentry:sentry:5.7.3")
   testImplementation("org.assertj:assertj-core:3.22.0")
