@@ -43,7 +43,8 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
       ConfigListener { newPluginState ->
         themeChangeAlarm.cancelAllRequests()
         if (newPluginState.isChangeTheme &&
-          newPluginState.pluginMode.toPluginMode() == PluginMode.TIMED) {
+          newPluginState.pluginMode.toPluginMode() == PluginMode.TIMED
+        ) {
           themeChangeAlarm.addRequest(
             self,
             convertMinutesToMillis(

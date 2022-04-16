@@ -15,5 +15,4 @@ enum class PluginMode(val displayName: String) {
   }
 }
 
-
 fun String.toPluginMode(): PluginMode = PluginMode.valueFrom(this)

@@ -10,6 +10,9 @@ import java.util.Optional
 import javax.swing.UIManager
 import kotlin.math.abs
 
+enum class SelectableThemeType {
+  DARK, LIGHT, ANY
+}
 class ThemeService : Disposable {
   companion object {
     val instance: ThemeService
@@ -53,7 +56,7 @@ class ThemeService : Disposable {
   }
 
   override fun dispose() {}
-  fun nextTheme(): Optional<UIManager.LookAndFeelInfo> =
+  fun nextTheme(selectableThemeType: SelectableThemeType = SelectableThemeType.ANY): Optional<UIManager.LookAndFeelInfo> =
     if (Config.instance.isRandomOrder) {
       getRandomTheme()
     } else pickNextTheme()
