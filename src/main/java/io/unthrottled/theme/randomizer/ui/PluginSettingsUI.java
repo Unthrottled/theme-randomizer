@@ -168,7 +168,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     config.setRandomOrder(pluginSettingsModel.isRandomOrder());
     config.setSelectedThemes(convertToStorageString(lafListPanelModel));
     config.setBlacklistedThemes(convertToStorageString(blackListPanelModel));
-    config.setPluginMode(pluginSettingsModel.getPluginMode());
+    config.setPluginModeEnum(pluginSettingsModel.getPluginMode());
     config.setChangeOnSystemSwitches(pluginSettingsModel.getChangeOnSystemSwitches());
     LafAnimationActor.INSTANCE.enableAnimation(pluginSettingsModel.isThemeTransition());
     ApplicationManager.getApplication().getMessageBus().syncPublisher(

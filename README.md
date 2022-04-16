@@ -35,12 +35,58 @@ This section is dedicated to describing the general configurable functionality t
 
 #### Settings
 
+**Plugin Mode**
+
+- **Timed**: Configures the plugin to randomly choose a theme to be used in a fixed time interval.
+- **Match OS**: Configures the plugin to randomly choose at theme when the plugin observes your system changes from
+  light to dark or dark to light.
+
 **Change Theme**
 
 If enabled this allows the randomizer plugin to change the theme at the specified interval.
 
 Note: if you set a theme manually, that will reset the countdown to changing the theme. Such as if you change a
 theme,and your interval is a day, then the next theme change will happen 24 hours after your manual theme change.
+
+__Switches Before Change__
+
+Allows you to specify how many times a theme will be associated with a system switch.
+
+For example, if you choose `0`, you will get a random theme everytime your system switches to a different mode.
+
+For clarity, if you choose `1`, and you have these themes:
+
+```
+Light Themes: Light A, Light B, Light C
+Dark Themes: Dark A, Dark B, Dark C
+```
+
+Here is a table as to how this would work:
+
+<details>
+  <summary>Theme Table</summary>
+
+| Day of Week | System Mode | Theme   |
+|-------------|-------------|---------|
+| Monday      | Dark AM     | Dark  C |
+| Monday      | Light       | Light B |
+| Monday      | Dark PM     | Dark  C |
+| Tuesday     | Light       | Light B |
+| Tuesday     | Dark        | Dark  A |
+| Wednesday   | Light       | Light C |
+| Wednesday   | Dark        | Dark  A |
+| Thursday    | Light       | Light C |
+| Thursday    | Dark        | Dark  B |
+| Friday      | Light       | Light A |
+| Friday      | Dark        | Dark  B |
+| Saturday    | Light       | Light A |
+
+**Note**: This is provided you are using your IDE any time before & after a system switch.
+EG, if you use your IDE monday morning and quit using it before Monday Night. Then you open your IDE up Thursday
+Morning, you'll still have the same theme.
+Themes only change when the plugin observes a system change.
+
+</details>
 
 **Random Order**
 

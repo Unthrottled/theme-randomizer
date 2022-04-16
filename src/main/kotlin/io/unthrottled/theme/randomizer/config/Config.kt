@@ -58,7 +58,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var lightSystemObservedCounts = DEFAULT_OBSERVATION_COUNT
   var darkSystemObservedCounts = DEFAULT_OBSERVATION_COUNT
 
-  fun setPluginMode(pluginMode: PluginMode) {
+  fun setPluginModeEnum(pluginMode: PluginMode) {
     this.pluginMode = pluginMode.displayName
   }
 

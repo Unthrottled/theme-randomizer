@@ -2,6 +2,12 @@
 
 # Theme Randomizer Changelog
 
+# 0.4.0
+
+### Added
+
+- Match OS mode, which allows the plugin to randomly change your theme when it observes your system settings change. [See docs for more details](./README.md#settings)
+
 # 0.3.0
 
 ### Added
