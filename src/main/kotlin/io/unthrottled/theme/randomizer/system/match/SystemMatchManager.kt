@@ -187,7 +187,7 @@ object SystemMatchManager : Disposable {
     }
   }
 
-  private fun isSystemMatch() = Config.instance.pluginMode.toPluginMode() == PluginMode.SYSTEM_MATCH
+  fun isSystemMatch() = Config.instance.pluginMode.toPluginMode() == PluginMode.SYSTEM_MATCH
 
   override fun dispose() {
     messageBus.dispose()
