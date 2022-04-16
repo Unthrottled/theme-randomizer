@@ -1,12 +1,10 @@
-package io.unthrottled.theme.randomizer.services
+package io.unthrottled.theme.randomizer.themes
 
-import com.intellij.ide.ui.laf.UIThemeBasedLookAndFeelInfo
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ConfigListener
-import io.unthrottled.theme.randomizer.config.ConfigListener.Companion.CONFIG_TOPIC
 import javax.swing.UIManager
 
 class ThemeGatekeeper : Disposable {
@@ -34,7 +32,7 @@ class ThemeGatekeeper : Disposable {
 
   init {
     connection.subscribe(
-      CONFIG_TOPIC,
+        ConfigListener.CONFIG_TOPIC,
       ConfigListener { newPluginState, _ ->
         preferredThemeIds = extractAllowedCharactersFromState(newPluginState.selectedThemes)
         blackListedThemeIds = extractAllowedCharactersFromState(newPluginState.blacklistedThemes)
@@ -60,9 +58,3 @@ class ThemeGatekeeper : Disposable {
     connection.dispose()
   }
 }
-
-fun UIManager.LookAndFeelInfo.getId(): String =
-  when (this) {
-    is UIThemeBasedLookAndFeelInfo -> this.theme.id
-    else -> this.name
-  }

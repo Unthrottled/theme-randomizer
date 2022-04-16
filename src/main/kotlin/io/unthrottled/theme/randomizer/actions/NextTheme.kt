@@ -4,7 +4,7 @@ import com.intellij.ide.actions.QuickChangeLookAndFeel
 import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import io.unthrottled.theme.randomizer.services.ThemeService
+import io.unthrottled.theme.randomizer.themes.ThemeService
 
 class NextTheme : AnAction() {
 

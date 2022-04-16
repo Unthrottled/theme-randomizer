@@ -21,6 +21,8 @@ data class ConfigSettingsModel(
   fun duplicate(): ConfigSettingsModel = copy()
 }
 
+const val DEFAULT_OBSERVATION_COUNT = -1
+
 @State(
   name = "Theme-Randomizer-Config",
   storages = [Storage("theme-randomizer.xml")]
@@ -53,8 +55,8 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var blacklistedThemes = ""
   var lastChangeTime = -1L
   var changeOnSystemSwitches = 1
-  var lightSystemObservedCounts = -1
-  var darkSystemObservedCounts = -1
+  var lightSystemObservedCounts = DEFAULT_OBSERVATION_COUNT
+  var darkSystemObservedCounts = DEFAULT_OBSERVATION_COUNT
 
   fun setPluginMode(pluginMode: PluginMode) {
     this.pluginMode = pluginMode.displayName

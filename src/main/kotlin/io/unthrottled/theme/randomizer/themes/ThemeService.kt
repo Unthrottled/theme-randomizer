@@ -1,19 +1,16 @@
-package io.unthrottled.theme.randomizer.services
+package io.unthrottled.theme.randomizer.themes
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.ServiceManager
 import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ui.isDark
+import io.unthrottled.theme.randomizer.services.LAFProbabilityService
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.util.Collections
 import java.util.Optional
 import javax.swing.UIManager
 import kotlin.math.abs
-
-enum class SelectableThemeType {
-  DARK, LIGHT, ANY
-}
 
 class ThemeService : Disposable {
   companion object {
@@ -54,12 +51,12 @@ class ThemeService : Disposable {
         it[
           (
             if (themeIndex > -1) themeIndex + 1 else abs(
-              Collections.binarySearch(
-                themes,
-                currentLookAndFeel
-              ) { themeOne, themeTwo ->
-                themeOne.name.compareTo(themeTwo.name)
-              } + 1
+                Collections.binarySearch(
+                    themes,
+                    currentLookAndFeel
+                ) { themeOne, themeTwo ->
+                    themeOne.name.compareTo(themeTwo.name)
+                } + 1
             )
             ) % it.size
         ]

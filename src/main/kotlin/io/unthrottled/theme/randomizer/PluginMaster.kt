@@ -7,8 +7,8 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.project.ProjectManagerListener
 import io.unthrottled.theme.randomizer.onboarding.UserOnBoarding
 import io.unthrottled.theme.randomizer.services.LAFProbabilityService
-import io.unthrottled.theme.randomizer.services.SystemMatchManager
-import io.unthrottled.theme.randomizer.services.ThemeChangeEventEmitter
+import io.unthrottled.theme.randomizer.timed.ThemeChangeEventEmitter
+import io.unthrottled.theme.randomizer.system.match.SystemMatchManager
 import io.unthrottled.theme.randomizer.tools.Logging
 
 class PluginMaster : ProjectManagerListener, Disposable, Logging {
