@@ -12,6 +12,7 @@ import io.unthrottled.theme.randomizer.config.DEFAULT_OBSERVATION_COUNT
 import io.unthrottled.theme.randomizer.mode.PluginMode
 import io.unthrottled.theme.randomizer.mode.toPluginMode
 import io.unthrottled.theme.randomizer.themes.SelectableThemeType
+import io.unthrottled.theme.randomizer.themes.ThemeGatekeeper
 import io.unthrottled.theme.randomizer.themes.ThemeService
 import io.unthrottled.theme.randomizer.themes.getId
 import io.unthrottled.theme.randomizer.tools.toOptional
@@ -150,6 +151,7 @@ object SystemMatchManager : Disposable {
           }
           .toOptional()
       }
+      .filter { ThemeGatekeeper.instance.isLegit(it) } // previously saved theme might have been blacklisted...
       .map { it.toOptional() }
       // if the property key or the saved theme isn't installed
       // pick another theme...
