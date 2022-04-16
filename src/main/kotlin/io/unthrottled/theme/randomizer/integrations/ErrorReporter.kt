@@ -21,7 +21,6 @@ import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.protocol.Message
 import io.sentry.protocol.User
-import io.unthrottled.amii.integrations.RestClient
 import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.tools.runSafely
 import java.awt.Component

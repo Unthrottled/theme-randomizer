@@ -40,7 +40,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   init {
     val self = this
     messageBus.subscribe(
-        ConfigListener.CONFIG_TOPIC,
+      ConfigListener.CONFIG_TOPIC,
       ConfigListener { newPluginState, _ ->
         themeChangeAlarm.cancelAllRequests()
         if (newPluginState.isChangeTheme &&
@@ -56,7 +56,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
       }
     )
     messageBus.subscribe(
-        LafManagerListener.TOPIC,
+      LafManagerListener.TOPIC,
       this,
     )
     themeChangeAlarm.addRequest(
@@ -85,7 +85,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
 
   private fun convertMinutesToMillis(duration: Long) = TimeUnit.MILLISECONDS.convert(
     duration,
-      TimeUnit.MINUTES
+    TimeUnit.MINUTES
   ).toInt()
 
   private fun getThemeSwitchCheckInterval(): Long =
@@ -114,9 +114,9 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     ThemeService.instance.nextTheme()
       .ifPresent {
         QuickChangeLookAndFeel.switchLafAndUpdateUI(
-            LafManager.getInstance(),
-            it,
-            true
+          LafManager.getInstance(),
+          it,
+          true
         )
         themeSet = it
         captureTimestamp()
@@ -128,8 +128,8 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     getThemeChangeIntervalInMinutes(config) <= getDurationSinceThemeChange().toMinutes()
 
   private fun getDurationSinceThemeChange() = Duration.between(
-      Instant.ofEpochSecond(Config.instance.lastChangeTime),
-      Instant.now()
+    Instant.ofEpochSecond(Config.instance.lastChangeTime),
+    Instant.now()
   )
 
   @SuppressWarnings("MagicNumber")

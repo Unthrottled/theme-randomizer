@@ -2,7 +2,7 @@ package io.unthrottled.theme.randomizer.themes
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.application.ApplicationManager
 import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ui.isDark
 import io.unthrottled.theme.randomizer.services.LAFProbabilityService
@@ -15,7 +15,7 @@ import kotlin.math.abs
 class ThemeService : Disposable {
   companion object {
     val instance: ThemeService
-      get() = ServiceManager.getService(ThemeService::class.java)
+      get() = ApplicationManager.getApplication().getService(ThemeService::class.java)
   }
 
   private fun getRandomTheme(
@@ -51,12 +51,12 @@ class ThemeService : Disposable {
         it[
           (
             if (themeIndex > -1) themeIndex + 1 else abs(
-                Collections.binarySearch(
-                    themes,
-                    currentLookAndFeel
-                ) { themeOne, themeTwo ->
-                    themeOne.name.compareTo(themeTwo.name)
-                } + 1
+              Collections.binarySearch(
+                themes,
+                currentLookAndFeel
+              ) { themeOne, themeTwo ->
+                themeOne.name.compareTo(themeTwo.name)
+              } + 1
             )
             ) % it.size
         ]

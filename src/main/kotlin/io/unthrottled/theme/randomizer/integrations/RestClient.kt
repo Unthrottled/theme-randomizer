@@ -1,7 +1,7 @@
-package io.unthrottled.amii.integrations
+package io.unthrottled.theme.randomizer.integrations
 
 import com.intellij.openapi.diagnostic.Logger
-import io.unthrottled.amii.integrations.RestTools.performRequest
+import io.unthrottled.theme.randomizer.integrations.RestTools.performRequest
 import io.unthrottled.theme.randomizer.tools.readAllTheBytes
 import io.unthrottled.theme.randomizer.tools.toOptional
 import org.apache.http.client.config.RequestConfig
