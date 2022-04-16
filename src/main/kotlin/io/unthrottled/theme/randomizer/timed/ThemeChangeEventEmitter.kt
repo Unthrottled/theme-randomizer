@@ -1,4 +1,4 @@
-package io.unthrottled.theme.randomizer.services
+package io.unthrottled.theme.randomizer.timed
 
 import com.intellij.ide.IdeEventQueue
 import com.intellij.ide.actions.QuickChangeLookAndFeel
@@ -10,7 +10,10 @@ import com.intellij.util.Alarm
 import io.unthrottled.theme.randomizer.config.ChangeIntervals
 import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ConfigListener
-import io.unthrottled.theme.randomizer.config.ConfigListener.Companion.CONFIG_TOPIC
+import io.unthrottled.theme.randomizer.mode.PluginMode
+import io.unthrottled.theme.randomizer.mode.toPluginMode
+import io.unthrottled.theme.randomizer.themes.ThemeService
+import io.unthrottled.theme.randomizer.themes.getId
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -37,10 +40,12 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   init {
     val self = this
     messageBus.subscribe(
-      CONFIG_TOPIC,
-      ConfigListener { newPluginState ->
+      ConfigListener.CONFIG_TOPIC,
+      ConfigListener { newPluginState, _ ->
         themeChangeAlarm.cancelAllRequests()
-        if (newPluginState.isChangeTheme) {
+        if (newPluginState.isChangeTheme &&
+          newPluginState.pluginMode.toPluginMode() == PluginMode.TIMED
+        ) {
           themeChangeAlarm.addRequest(
             self,
             convertMinutesToMillis(

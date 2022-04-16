@@ -5,6 +5,7 @@ import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import io.unthrottled.theme.randomizer.themes.getId
 import io.unthrottled.theme.randomizer.tools.AlarmDebouncer
 import io.unthrottled.theme.randomizer.tools.ProbabilityTools
 import java.util.Optional

@@ -1,9 +1,11 @@
-package io.unthrottled.theme.randomizer.services
+package io.unthrottled.theme.randomizer.themes
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.application.ApplicationManager
 import io.unthrottled.theme.randomizer.config.Config
+import io.unthrottled.theme.randomizer.config.ui.isDark
+import io.unthrottled.theme.randomizer.services.LAFProbabilityService
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.util.Collections
 import java.util.Optional
@@ -13,22 +15,31 @@ import kotlin.math.abs
 class ThemeService : Disposable {
   companion object {
     val instance: ThemeService
-      get() = ServiceManager.getService(ThemeService::class.java)
+      get() = ApplicationManager.getApplication().getService(ThemeService::class.java)
   }
 
-  private fun getRandomTheme(): Optional<UIManager.LookAndFeelInfo> {
+  private fun getRandomTheme(
+    selectableThemeType: SelectableThemeType
+  ): Optional<UIManager.LookAndFeelInfo> {
     val currentLaf = LafManager.getInstance().currentLookAndFeel
     return LAFProbabilityService.instance.pickAssetFromList(
-      getPreferredThemes().filter { it.getId() != currentLaf.getId() }
+      getPreferredThemes(selectableThemeType).filter { it.getId() != currentLaf.getId() }
     )
   }
 
-  private fun getPreferredThemes() =
+  private fun getPreferredThemes(selectableThemeType: SelectableThemeType) =
     LafManager.getInstance().installedLookAndFeels
+      .filter {
+        when (selectableThemeType) {
+          SelectableThemeType.ANY -> true
+          SelectableThemeType.LIGHT -> it.isDark().not()
+          SelectableThemeType.DARK -> it.isDark()
+        }
+      }
       .filter { ThemeGatekeeper.instance.isLegit(it) }
 
-  private fun pickNextTheme(): Optional<UIManager.LookAndFeelInfo> {
-    val themes = getPreferredThemes().sortedBy { it.name }
+  private fun pickNextTheme(selectableThemeType: SelectableThemeType): Optional<UIManager.LookAndFeelInfo> {
+    val themes = getPreferredThemes(selectableThemeType).sortedBy { it.name }
     val currentLookAndFeel = LafManager.getInstance().currentLookAndFeel
     val themeIndex = themes.indexOfLast {
       it.getId() == currentLookAndFeel.getId()
@@ -53,8 +64,10 @@ class ThemeService : Disposable {
   }
 
   override fun dispose() {}
-  fun nextTheme(): Optional<UIManager.LookAndFeelInfo> =
+  fun nextTheme(
+    selectableThemeType: SelectableThemeType = SelectableThemeType.ANY
+  ): Optional<UIManager.LookAndFeelInfo> =
     if (Config.instance.isRandomOrder) {
-      getRandomTheme()
-    } else pickNextTheme()
+      getRandomTheme(selectableThemeType)
+    } else pickNextTheme(selectableThemeType)
 }

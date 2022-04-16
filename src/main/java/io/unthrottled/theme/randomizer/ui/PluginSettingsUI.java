@@ -13,7 +13,9 @@ import io.unthrottled.theme.randomizer.config.ConfigSettingsModel;
 import io.unthrottled.theme.randomizer.config.IntervalTuple;
 import io.unthrottled.theme.randomizer.config.SettingsHelper;
 import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor;
-import io.unthrottled.theme.randomizer.services.ThemeGatekeeper;
+import io.unthrottled.theme.randomizer.mode.PluginMode;
+import io.unthrottled.theme.randomizer.system.match.SystemMatchManager;
+import io.unthrottled.theme.randomizer.themes.ThemeGatekeeper;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +26,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.SpinnerNumberModel;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -41,6 +45,12 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JCheckBox animationCheckbox;
   private JTabbedPane preferredThemesTabbo;
   private JPanel blackListPane;
+  private JPanel timedSettingsPanel;
+  private JComboBox<PluginMode> pluginModeComboBox;
+  private JSpinner systemChangeSpinner;
+  private JPanel systemMatchSettingsPanel;
+  private JPanel timedSettingsConfigPanel;
+  private JPanel pluginModePanel;
   private LAFListPanel lafListPanelModel;
   private LAFListPanel blackListPanelModel;
 
@@ -107,7 +117,35 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     animationCheckbox.addActionListener(e ->
       pluginSettingsModel.setThemeTransition(animationCheckbox.isSelected()));
 
+    SpinnerNumberModel systemChangeSpinnerModel = new SpinnerNumberModel(
+      initialSettings.getChangeOnSystemSwitches(),
+      0,
+      Integer.MAX_VALUE,
+      1
+    );
+
+    systemChangeSpinner.setModel(systemChangeSpinnerModel);
+    systemChangeSpinner.addChangeListener(change ->
+      pluginSettingsModel.setChangeOnSystemSwitches(systemChangeSpinnerModel.getNumber().intValue()
+    ));
+
+    DefaultComboBoxModel<PluginMode> pluginModeModel = new DefaultComboBoxModel<>(PluginMode.values());
+    pluginModeModel.setSelectedItem(pluginSettingsModel.getPluginMode());
+    setActiveModeDisplay(pluginSettingsModel.getPluginMode());
+    pluginModeComboBox.setModel(pluginModeModel);
+    pluginModeComboBox.addActionListener(e -> {
+      setActiveModeDisplay((PluginMode) pluginModeModel.getSelectedItem());
+      pluginSettingsModel.setPluginMode((PluginMode)pluginModeModel.getSelectedItem());
+    });
+
+    pluginModePanel.setVisible(SystemMatchManager.INSTANCE.isSystemMatchAvailable());
+
     return rootPane;
+  }
+
+  private void setActiveModeDisplay(PluginMode currentPluginMode) {
+    systemMatchSettingsPanel.setVisible(PluginMode.SYSTEM_MATCH.equals(currentPluginMode));
+    timedSettingsConfigPanel.setVisible(PluginMode.TIMED.equals(currentPluginMode));
   }
 
   @NotNull
@@ -130,10 +168,12 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     config.setRandomOrder(pluginSettingsModel.isRandomOrder());
     config.setSelectedThemes(convertToStorageString(lafListPanelModel));
     config.setBlacklistedThemes(convertToStorageString(blackListPanelModel));
+    config.setPluginModeEnum(pluginSettingsModel.getPluginMode());
+    config.setChangeOnSystemSwitches(pluginSettingsModel.getChangeOnSystemSwitches());
     LafAnimationActor.INSTANCE.enableAnimation(pluginSettingsModel.isThemeTransition());
     ApplicationManager.getApplication().getMessageBus().syncPublisher(
       ConfigListener.Companion.getCONFIG_TOPIC()
-    ).pluginConfigUpdated(config);
+    ).pluginConfigUpdated(config, initialSettings);
     initialSettings = pluginSettingsModel.duplicate();
   }
 
