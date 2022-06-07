@@ -86,10 +86,13 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
 
   @Override
   public @Nullable JComponent createComponent() {
-    ThemeSelectionService.Companion.getInstance().reHydrateIfNecessary();
+    reHydrateSelectionLists(initialSettings.isLocalSync());
     locallyAutoSyncSettingsCheckBox.setSelected(initialSettings.isLocalSync());
-    locallyAutoSyncSettingsCheckBox.addActionListener(a ->
-      pluginSettingsModel.setLocalSync(locallyAutoSyncSettingsCheckBox.isSelected())
+    locallyAutoSyncSettingsCheckBox.addActionListener(a -> {
+        boolean isLocalSync = locallyAutoSyncSettingsCheckBox.isSelected();
+        reHydrateSelectionLists(isLocalSync);
+        pluginSettingsModel.setLocalSync(isLocalSync);
+      }
     );
 
     changeIntervalWomboComboBox.setModel(
@@ -149,6 +152,14 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     pluginModePanel.setVisible(SystemMatchManager.INSTANCE.isSystemMatchAvailable());
 
     return rootPane;
+  }
+
+  private void reHydrateSelectionLists(boolean localSync) {
+    ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      ThemeSelectionService.Companion.getInstance().reHydrateIfNecessary(localSync);
+      this.lafListPanelModel.reset();
+      this.blackListPanelModel.reset();
+    });
   }
 
   private void setActiveModeDisplay(PluginMode currentPluginMode) {

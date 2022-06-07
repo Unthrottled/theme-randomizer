@@ -14,10 +14,12 @@ class ThemeSelectionService {
   private var _blackListedThemeIds: Set<String>
 
   init {
-    val currentThemeSelections = ThemeSelectionExtractor.extractThemeSelectionsFromConfig(Config.instance)
+    val currentThemeSelections = getThemeSelectionsFromConfigs()
     _preferredThemeIds = currentThemeSelections.preferredThemeIdSet
     _blackListedThemeIds = currentThemeSelections.blacklistedThemeIdSet
   }
+
+  private fun getThemeSelectionsFromConfigs() = ThemeSelectionExtractor.extractThemeSelectionsFromConfig(Config.instance)
 
   fun rehydrateSelectionsFromConfig(config: Config) {
     val currentThemeSelections = ThemeSelectionExtractor.extractThemeSelectionsFromConfig(config)
@@ -29,9 +31,11 @@ class ThemeSelectionService {
     _blackListedThemeIds = currentThemeSelections.blacklistedThemeIdSet
   }
 
-  fun reHydrateIfNecessary() {
-    if (Config.instance.isLocalSync) {
+  fun reHydrateIfNecessary(isLocalSync: Boolean = Config.instance.isLocalSync) {
+    if (isLocalSync) {
       rehydrateFromSelections(LocalThemeSelectionService.getThemeSelections())
+    } else {
+      rehydrateFromSelections(getThemeSelectionsFromConfigs())
     }
   }
 
