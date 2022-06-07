@@ -33,8 +33,8 @@ object LockMaster {
 
   fun acquireLock(id: String): Boolean =
     when {
-      Files.notExists(lockPath) -> lockPromotion(id)
-      canBreakLock() -> breakAndLockPromotion(id)
+      Files.notExists(lockPath) -> lockProcess(id)
+      canBreakLock() -> breakAndLockProcess(id)
       else -> false
     }
 
@@ -48,9 +48,9 @@ object LockMaster {
       }
       .orElse(true)
 
-  private fun breakAndLockPromotion(id: String): Boolean =
+  private fun breakAndLockProcess(id: String): Boolean =
     if (breakLock()) {
-      lockPromotion(id)
+      lockProcess(id)
     } else {
       false
     }
@@ -79,7 +79,7 @@ object LockMaster {
       true
     }
 
-  private fun lockPromotion(id: String): Boolean =
+  private fun lockProcess(id: String): Boolean =
     writeLock(Lock(id, Instant.now()))
 
   private fun readLock(): Optional<Lock> =
@@ -107,7 +107,7 @@ object LockMaster {
         }
       true
     }) {
-      log.warn("Unable to write promotion ledger for raisins.", it)
+      log.warn("Unable to write theme lock for raisins.", it)
       false
     }
 }

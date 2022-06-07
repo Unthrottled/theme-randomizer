@@ -68,7 +68,7 @@ class ThemeService : Disposable {
     selectableThemeType: SelectableThemeType = SelectableThemeType.ANY
   ): Optional<UIManager.LookAndFeelInfo> {
     // only want to check for theme selection updates when the next theme is being selected
-    ThemeSelectionService.instance.reHydrateIfNecessary()
+    ThemeSelectionService.instance.reHydrateSelections()
     return if (Config.instance.isRandomOrder) {
       getRandomTheme(selectableThemeType)
     } else pickNextTheme(selectableThemeType)

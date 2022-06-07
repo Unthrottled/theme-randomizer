@@ -31,9 +31,10 @@ class ThemeSelectionService {
     _blackListedThemeIds = currentThemeSelections.blacklistedThemeIdSet
   }
 
-  fun reHydrateIfNecessary(isLocalSync: Boolean = Config.instance.isLocalSync) {
+  fun reHydrateSelections(isLocalSync: Boolean = Config.instance.isLocalSync) {
+    // todo: might need to not run on AWT thread.
     if (isLocalSync) {
-      rehydrateFromSelections(LocalThemeSelectionService.getThemeSelections())
+      rehydrateFromSelections(LocalThemeSelectionService.getInitialItem())
     } else {
       rehydrateFromSelections(getThemeSelectionsFromConfigs())
     }

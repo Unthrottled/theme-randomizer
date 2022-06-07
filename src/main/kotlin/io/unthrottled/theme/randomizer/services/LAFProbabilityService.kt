@@ -46,7 +46,7 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     )
   }
 
-  private val seenAssetLedger = ThemeObservationService.getInitialLedger()
+  private val seenAssetLedger = ThemeObservationService.getInitialItem()
 
   private val random = java.util.Random()
   private val probabilityTools = ProbabilityTools(

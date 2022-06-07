@@ -156,7 +156,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
 
   private void reHydrateSelectionLists(boolean localSync) {
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
-      ThemeSelectionService.Companion.getInstance().reHydrateIfNecessary(localSync);
+      ThemeSelectionService.Companion.getInstance().reHydrateSelections(localSync);
       this.lafListPanelModel.reset();
       this.blackListPanelModel.reset();
     });
