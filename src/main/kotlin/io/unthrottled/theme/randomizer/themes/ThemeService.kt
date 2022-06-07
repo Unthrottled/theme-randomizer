@@ -66,8 +66,11 @@ class ThemeService : Disposable {
   override fun dispose() {}
   fun nextTheme(
     selectableThemeType: SelectableThemeType = SelectableThemeType.ANY
-  ): Optional<UIManager.LookAndFeelInfo> =
-    if (Config.instance.isRandomOrder) {
+  ): Optional<UIManager.LookAndFeelInfo> {
+    // only want to check for theme selection updates when the next theme is being selected
+    ThemeSelectionService.instance.reHydrateIfNecessary()
+    return if (Config.instance.isRandomOrder) {
       getRandomTheme(selectableThemeType)
     } else pickNextTheme(selectableThemeType)
+  }
 }

@@ -16,6 +16,7 @@ import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor;
 import io.unthrottled.theme.randomizer.mode.PluginMode;
 import io.unthrottled.theme.randomizer.system.match.SystemMatchManager;
 import io.unthrottled.theme.randomizer.themes.ThemeGatekeeper;
+import io.unthrottled.theme.randomizer.themes.ThemeSelectionService;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +52,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JPanel systemMatchSettingsPanel;
   private JPanel timedSettingsConfigPanel;
   private JPanel pluginModePanel;
+  private JCheckBox locallyAutoSyncSettingsCheckBox;
   private LAFListPanel lafListPanelModel;
   private LAFListPanel blackListPanelModel;
 
@@ -84,6 +86,12 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
 
   @Override
   public @Nullable JComponent createComponent() {
+    ThemeSelectionService.Companion.getInstance().reHydrateIfNecessary();
+    locallyAutoSyncSettingsCheckBox.setSelected(initialSettings.isLocalSync());
+    locallyAutoSyncSettingsCheckBox.addActionListener(a ->
+      pluginSettingsModel.setLocalSync(locallyAutoSyncSettingsCheckBox.isSelected())
+    );
+
     changeIntervalWomboComboBox.setModel(
       new DefaultComboBoxModel<>(
         new Vector<>(
@@ -127,7 +135,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     systemChangeSpinner.setModel(systemChangeSpinnerModel);
     systemChangeSpinner.addChangeListener(change ->
       pluginSettingsModel.setChangeOnSystemSwitches(systemChangeSpinnerModel.getNumber().intValue()
-    ));
+      ));
 
     DefaultComboBoxModel<PluginMode> pluginModeModel = new DefaultComboBoxModel<>(PluginMode.values());
     pluginModeModel.setSelectedItem(pluginSettingsModel.getPluginMode());
@@ -135,7 +143,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     pluginModeComboBox.setModel(pluginModeModel);
     pluginModeComboBox.addActionListener(e -> {
       setActiveModeDisplay((PluginMode) pluginModeModel.getSelectedItem());
-      pluginSettingsModel.setPluginMode((PluginMode)pluginModeModel.getSelectedItem());
+      pluginSettingsModel.setPluginMode((PluginMode) pluginModeModel.getSelectedItem());
     });
 
     pluginModePanel.setVisible(SystemMatchManager.INSTANCE.isSystemMatchAvailable());
@@ -170,6 +178,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     config.setBlacklistedThemes(convertToStorageString(blackListPanelModel));
     config.setPluginModeEnum(pluginSettingsModel.getPluginMode());
     config.setChangeOnSystemSwitches(pluginSettingsModel.getChangeOnSystemSwitches());
+    config.setLocalSync(pluginSettingsModel.isLocalSync());
     LafAnimationActor.INSTANCE.enableAnimation(pluginSettingsModel.isThemeTransition());
     ApplicationManager.getApplication().getMessageBus().syncPublisher(
       ConfigListener.Companion.getCONFIG_TOPIC()

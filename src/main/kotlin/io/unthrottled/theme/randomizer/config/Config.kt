@@ -17,6 +17,7 @@ data class ConfigSettingsModel(
   var isThemeTransition: Boolean,
   var pluginMode: PluginMode,
   var changeOnSystemSwitches: Int,
+  var isLocalSync: Boolean,
 ) {
   fun duplicate(): ConfigSettingsModel = copy()
 }
@@ -42,6 +43,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
       isThemeTransition = LafAnimationActor.getAnimationEnabled(),
       pluginMode = instance.pluginMode.toPluginMode(),
       changeOnSystemSwitches = instance.changeOnSystemSwitches,
+      isLocalSync = instance.isLocalSync,
     )
   }
 
@@ -55,6 +57,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var blacklistedThemes = ""
   var lastChangeTime = -1L
   var changeOnSystemSwitches = 1
+  var isLocalSync: Boolean = false
   var lightSystemObservedCounts = DEFAULT_OBSERVATION_COUNT
   var darkSystemObservedCounts = DEFAULT_OBSERVATION_COUNT
 
