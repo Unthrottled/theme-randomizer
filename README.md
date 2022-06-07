@@ -95,6 +95,13 @@ see the same theme too many times!
 
 If it is not set, then the plugin will run through the themes sequentially by name in ascending order.
 
+**Locally Auto-Sync Settings**
+Allows you to _only_ synchronize the list of preferred/blacklisted themes across IDEs.
+
+The first IDE that you enable Locally Auto-Sync Settings in the settings & save will set the initial list.
+Then when you go to another IDE & enable Locally Auto-Sync Settings, then the settings from the other IDE will overwrite the current settings (e.g. keeps it in sync with the first one).
+As long as there is a centralized setting, that will overwrite the IDE settings, when Locally Auto-Sync Settings. When you disable the action, it will go back to the IDE specific setting.
+
 **Theme Transition Animation**
 
 Toggles the built-in theme change fade animation.

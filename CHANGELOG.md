@@ -2,6 +2,12 @@
 
 # Theme Randomizer Changelog
 
+# 0.6.0
+
+### Added
+
+- Local theme selection settings synchronization.
+
 # 0.5.0
 
 ### Added

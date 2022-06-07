@@ -19,7 +19,8 @@ class ThemeSelectionService {
     _blackListedThemeIds = currentThemeSelections.blacklistedThemeIdSet
   }
 
-  private fun getThemeSelectionsFromConfigs() = ThemeSelectionExtractor.extractThemeSelectionsFromConfig(Config.instance)
+  private fun getThemeSelectionsFromConfigs() =
+    ThemeSelectionExtractor.extractThemeSelectionsFromConfig(Config.instance)
 
   fun rehydrateSelectionsFromConfig(config: Config) {
     val currentThemeSelections = ThemeSelectionExtractor.extractThemeSelectionsFromConfig(config)
