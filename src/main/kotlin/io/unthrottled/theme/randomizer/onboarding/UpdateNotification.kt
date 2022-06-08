@@ -22,6 +22,7 @@ private val UPDATE_MESSAGE: String =
       <ul>
           <li>Added Match OS mode.</li>
           <li>2022.2 Build Support</li>
+          <li>Local Theme Settings Sync.</li>
       </ul>
       <br>Please see the <a href="https://github.com/Unthrottled/theme-randomizer/blob/master/CHANGELOG.md">changelog</a> for more details.
       Thanks for downloading!
