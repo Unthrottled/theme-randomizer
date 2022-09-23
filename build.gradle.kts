@@ -45,7 +45,7 @@ repositories {
 dependencies {
   detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.21.0")
   implementation("commons-io:commons-io:2.11.0")
-  implementation("io.sentry:sentry:6.4.1")
+  implementation("io.sentry:sentry:6.4.2")
   testImplementation("org.assertj:assertj-core:3.23.1")
   testImplementation("io.mockk:mockk:1.13.1")
 }
