@@ -20,9 +20,7 @@ private val UPDATE_MESSAGE: String =
   """
       What's New?<br>
       <ul>
-          <li>Added Match OS mode.</li>
-          <li>2022.2 Build Support</li>
-          <li>Local Theme Settings Sync.</li>
+          <li>2022.3 Build Support</li>
       </ul>
       <br>Please see the <a href="https://github.com/Unthrottled/theme-randomizer/blob/master/CHANGELOG.md">changelog</a> for more details.
       Thanks for downloading!

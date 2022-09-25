@@ -2,6 +2,12 @@
 
 # Theme Randomizer Changelog
 
+# 0.7.0
+
+### Added
+
+- 2022.3 Build Support
+
 # 0.6.0
 
 ### Added
