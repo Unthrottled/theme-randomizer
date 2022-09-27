@@ -175,6 +175,10 @@ class PreferredLAFTree(
       }
 
   private fun reset(sortedThemeData: List<ThemeGroupData>) {
+    if (!EventQueue.isDispatchThread()) {
+      return
+    }
+
     val root = CheckedTreeNode(null)
     val treeModel = myTree.model as DefaultTreeModel
     sortedThemeData.forEach { themeData ->

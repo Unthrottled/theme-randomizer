@@ -4,6 +4,12 @@
 
 # 0.7.0
 
+### Fixed
+
+- Issue when the plugin would throw an exception when using the `Search Everywhere` component.
+
+# 0.7.0
+
 ### Added
 
 - 2022.3 Build Support
