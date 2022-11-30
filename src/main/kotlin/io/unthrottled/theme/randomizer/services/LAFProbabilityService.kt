@@ -93,8 +93,11 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
   // biased to be shown to the user.
   private fun getAssetSeenCount(lookAndFeelId: String): Int {
     val seenAssets = seenAssetLedger.assetSeenCounts
-    return if (seenAssets.containsKey(lookAndFeelId)) seenAssets[lookAndFeelId]!!
-    else floor(seenAssets.entries.map { it.value }.average()).toInt()
+    return if (seenAssets.containsKey(lookAndFeelId)) {
+      seenAssets[lookAndFeelId]!!
+    } else {
+      floor(seenAssets.entries.map { it.value }.average()).toInt()
+    }
   }
 
   override fun run() {

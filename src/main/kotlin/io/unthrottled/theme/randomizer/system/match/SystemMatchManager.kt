@@ -59,8 +59,11 @@ internal object SystemStateObserver {
     }
     val didSystemTypeChange = lastObservedSystemType == null ||
       lastObservedSystemType != currentSystemType
-    return if (didSystemTypeChange) SystemStateObservation.CHANGED
-    else SystemStateObservation.SAME
+    return if (didSystemTypeChange) {
+      SystemStateObservation.CHANGED
+    } else {
+      SystemStateObservation.SAME
+    }
   }
 }
 
@@ -130,7 +133,8 @@ object SystemMatchManager : Disposable {
   private fun rememberTheme(currentSystemType: SystemType, lookAndFeel: UIManager.LookAndFeelInfo) {
     val propertyKey = getPreviousThemePropertyKey(currentSystemType)
     PropertiesComponent.getInstance().setValue(
-      propertyKey, lookAndFeel.getId()
+      propertyKey,
+      lookAndFeel.getId()
     )
   }
 

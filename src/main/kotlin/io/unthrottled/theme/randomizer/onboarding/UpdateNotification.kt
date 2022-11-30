@@ -70,7 +70,8 @@ object UpdateNotification {
     listener: NotificationListener = defaultListener
   ) {
     notificationGroup.createNotification(
-      content, NotificationType.INFORMATION
+      content,
+      NotificationType.INFORMATION
     )
       .setTitle(title)
       .setIcon(PLUGIN_ICON)
