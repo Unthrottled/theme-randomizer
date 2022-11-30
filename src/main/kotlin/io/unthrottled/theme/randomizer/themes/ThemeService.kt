@@ -50,14 +50,18 @@ class ThemeService : Disposable {
       .map {
         it[
           (
-            if (themeIndex > -1) themeIndex + 1 else abs(
-              Collections.binarySearch(
-                themes,
-                currentLookAndFeel
-              ) { themeOne, themeTwo ->
-                themeOne.name.compareTo(themeTwo.name)
-              } + 1
-            )
+            if (themeIndex > -1) {
+              themeIndex + 1
+            } else {
+              abs(
+                Collections.binarySearch(
+                  themes,
+                  currentLookAndFeel
+                ) { themeOne, themeTwo ->
+                  themeOne.name.compareTo(themeTwo.name)
+                } + 1
+              )
+            }
             ) % it.size
         ]
       }
@@ -71,6 +75,8 @@ class ThemeService : Disposable {
     ThemeSelectionService.instance.reHydrateSelections()
     return if (Config.instance.isRandomOrder) {
       getRandomTheme(selectableThemeType)
-    } else pickNextTheme(selectableThemeType)
+    } else {
+      pickNextTheme(selectableThemeType)
+    }
   }
 }
