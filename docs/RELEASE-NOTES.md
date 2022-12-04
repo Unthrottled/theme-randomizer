@@ -1,3 +1,7 @@
-### Fixed
+### Added
 
-- Issue when the plugin would throw an exception when using the `Search Everywhere` component. (Better 2022.3 support)
+- `Match OS` setting for timed mode theme shuffle.
+
+### Changed
+
+- Lowest supported build to 2021.1
