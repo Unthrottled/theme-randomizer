@@ -2,6 +2,16 @@
 
 # Theme Randomizer Changelog
 
+# 0.8.0
+
+### Added
+
+- `Match OS` setting for timed mode theme shuffle.
+
+### Changed
+
+- Lowest supported build to 2021.1
+
 # 0.7.0
 
 ### Fixed

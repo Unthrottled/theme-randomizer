@@ -88,6 +88,11 @@ Themes only change when the plugin observes a system change.
 
 </details>
 
+**Match OS**
+
+When the plugin is `Timed` mode you have the option to randomly pick a theme that matches your OS's current setting.
+If left unchecked, the plugin will randomly choose a theme regardless of the OS's setting. So you could get a dark theme when your OS is light and vice versa.
+
 **Random Order**
 
 Well this puts the randomizer in `Theme Randomizer`. This will evenly and randomly distribute all themes, so you don't

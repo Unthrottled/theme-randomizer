@@ -90,6 +90,9 @@ object SystemMatchManager : Disposable {
     )
   }
 
+  val isDark: Boolean
+    get() = lafDetector.value.isDark()
+
   private val lafDetector = lazy {
     SystemDarkThemeDetector.createDetector { systemIsDark: Boolean ->
       handleSystemUpdateEvent(
