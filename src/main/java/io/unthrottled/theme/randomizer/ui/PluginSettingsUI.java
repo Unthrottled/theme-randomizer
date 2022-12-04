@@ -53,6 +53,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
   private JPanel timedSettingsConfigPanel;
   private JPanel pluginModePanel;
   private JCheckBox locallyAutoSyncSettingsCheckBox;
+  private JCheckBox matchOSCheckBox;
   private LAFListPanel lafListPanelModel;
   private LAFListPanel blackListPanelModel;
 
@@ -128,6 +129,10 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     animationCheckbox.addActionListener(e ->
       pluginSettingsModel.setThemeTransition(animationCheckbox.isSelected()));
 
+    matchOSCheckBox.setSelected(initialSettings.isTimedMatchOS());
+    matchOSCheckBox.addActionListener(e ->
+      pluginSettingsModel.setTimedMatchOS(matchOSCheckBox.isSelected()));
+
     SpinnerNumberModel systemChangeSpinnerModel = new SpinnerNumberModel(
       initialSettings.getChangeOnSystemSwitches(),
       0,
@@ -149,7 +154,9 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
       pluginSettingsModel.setPluginMode((PluginMode) pluginModeModel.getSelectedItem());
     });
 
-    pluginModePanel.setVisible(SystemMatchManager.INSTANCE.isSystemMatchAvailable());
+    boolean systemMatchAvailable = SystemMatchManager.INSTANCE.isSystemMatchAvailable();
+    pluginModePanel.setVisible(systemMatchAvailable);
+    matchOSCheckBox.setVisible(systemMatchAvailable);
 
     return rootPane;
   }
@@ -190,6 +197,7 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
     config.setPluginModeEnum(pluginSettingsModel.getPluginMode());
     config.setChangeOnSystemSwitches(pluginSettingsModel.getChangeOnSystemSwitches());
     config.setLocalSync(pluginSettingsModel.isLocalSync());
+    config.setTimedMatchOS(pluginSettingsModel.isTimedMatchOS());
     LafAnimationActor.INSTANCE.enableAnimation(pluginSettingsModel.isThemeTransition());
     ApplicationManager.getApplication().getMessageBus().syncPublisher(
       ConfigListener.Companion.getCONFIG_TOPIC()

@@ -18,6 +18,7 @@ data class ConfigSettingsModel(
   var pluginMode: PluginMode,
   var changeOnSystemSwitches: Int,
   var isLocalSync: Boolean,
+  var isTimedMatchOS: Boolean,
 ) {
   fun duplicate(): ConfigSettingsModel = copy()
 }
@@ -44,6 +45,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
       pluginMode = instance.pluginMode.toPluginMode(),
       changeOnSystemSwitches = instance.changeOnSystemSwitches,
       isLocalSync = instance.isLocalSync,
+      isTimedMatchOS = instance.isTimedMatchOS,
     )
   }
 
@@ -58,6 +60,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
   var lastChangeTime = -1L
   var changeOnSystemSwitches = 1
   var isLocalSync: Boolean = false
+  var isTimedMatchOS: Boolean = false
   var lightSystemObservedCounts = DEFAULT_OBSERVATION_COUNT
   var darkSystemObservedCounts = DEFAULT_OBSERVATION_COUNT
 

@@ -11,6 +11,7 @@ import io.unthrottled.theme.randomizer.config.ChangeIntervals
 import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ConfigListener
 import io.unthrottled.theme.randomizer.mode.PluginMode
+import io.unthrottled.theme.randomizer.mode.getCurrentSelectableThemeType
 import io.unthrottled.theme.randomizer.mode.toPluginMode
 import io.unthrottled.theme.randomizer.themes.ThemeService
 import io.unthrottled.theme.randomizer.themes.getId
@@ -111,7 +112,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   override fun run() {
     if (Config.instance.isChangeTheme.not() || isTime(Config.instance).not()) return
 
-    ThemeService.instance.nextTheme()
+    ThemeService.instance.nextTheme(getCurrentSelectableThemeType())
       .ifPresent {
         QuickChangeLookAndFeel.switchLafAndUpdateUI(
           LafManager.getInstance(),

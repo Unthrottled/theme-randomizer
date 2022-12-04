@@ -2,6 +2,12 @@
 
 # Theme Randomizer Changelog
 
+# 0.8.0
+
+### Added
+
+- `Match OS` setting for timed mode theme shuffle.
+
 # 0.7.0
 
 ### Fixed
