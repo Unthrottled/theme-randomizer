@@ -2,7 +2,6 @@ package io.unthrottled.theme.randomizer.services
 
 import com.google.gson.GsonBuilder
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.util.io.exists
 import io.unthrottled.theme.randomizer.tools.runSafelyWithResult
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.io.InputStreamReader
@@ -12,6 +11,7 @@ import java.nio.file.StandardOpenOption
 import java.time.Duration
 import java.time.Instant
 import java.util.Optional
+import kotlin.io.path.exists
 
 data class Lock(
   val lockedBy: String,
