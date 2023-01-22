@@ -21,6 +21,7 @@ private val UPDATE_MESSAGE: String =
       What's New?<br>
       <ul>
           <li>Added Match OS setting for Timed Mode.</li>
+          <li>Initial 2023.1 Build Support</li>
       </ul>
       <br>Please see the <a href="https://github.com/Unthrottled/theme-randomizer/blob/master/CHANGELOG.md">changelog</a> for more details.
       Thanks for downloading!
