@@ -15,7 +15,7 @@ enum class AssetCategory(val directory: String) {
 
 data class ThemeObservationLedger(
   val assetSeenCounts: ConcurrentMap<String, Int>,
-  val writeDate: Instant,
+  val writeDate: Instant
 )
 
 object ThemeObservationService : LocalPersistenceService<ThemeObservationLedger> (

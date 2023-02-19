@@ -18,7 +18,7 @@ data class ConfigSettingsModel(
   var pluginMode: PluginMode,
   var changeOnSystemSwitches: Int,
   var isLocalSync: Boolean,
-  var isTimedMatchOS: Boolean,
+  var isTimedMatchOS: Boolean
 ) {
   fun duplicate(): ConfigSettingsModel = copy()
 }
@@ -45,7 +45,7 @@ class Config : PersistentStateComponent<Config>, Cloneable {
       pluginMode = instance.pluginMode.toPluginMode(),
       changeOnSystemSwitches = instance.changeOnSystemSwitches,
       isLocalSync = instance.isLocalSync,
-      isTimedMatchOS = instance.isTimedMatchOS,
+      isTimedMatchOS = instance.isTimedMatchOS
     )
   }
 
