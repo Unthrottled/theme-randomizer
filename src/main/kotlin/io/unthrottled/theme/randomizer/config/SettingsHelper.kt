@@ -15,7 +15,7 @@ object SettingsHelper {
 
 data class IntervalTuple(
   val interval: ChangeIntervals,
-  val displayValue: String,
+  val displayValue: String
 ) {
   override fun toString(): String = displayValue
 }

@@ -4,7 +4,7 @@ import io.unthrottled.theme.randomizer.config.Config
 
 data class ThemeSelections(
   val preferredThemeIdSet: Set<String>,
-  val blacklistedThemeIdSet: Set<String>,
+  val blacklistedThemeIdSet: Set<String>
 )
 
 object ThemeSelectionExtractor {

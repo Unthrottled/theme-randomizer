@@ -9,7 +9,7 @@ enum class ChangeIntervals {
   HOUR,
   DAY,
   TWO_DAYS,
-  WEEK,
+  WEEK
   ;
 
   companion object {

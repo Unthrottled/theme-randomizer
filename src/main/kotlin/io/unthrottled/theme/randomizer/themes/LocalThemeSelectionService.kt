@@ -4,7 +4,7 @@ import io.unthrottled.theme.randomizer.config.Config
 
 object LocalThemeSelectionService : LocalPersistenceService<ThemeSelections>(
   "theme-selections.json",
-  ThemeSelections::class.java,
+  ThemeSelections::class.java
 ) {
   override fun decorateItem(item: ThemeSelections): ThemeSelections = item
 

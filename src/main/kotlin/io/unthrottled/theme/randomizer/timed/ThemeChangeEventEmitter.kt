@@ -58,7 +58,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     )
     messageBus.subscribe(
       LafManagerListener.TOPIC,
-      this,
+      this
     )
     themeChangeAlarm.addRequest(
       this,
