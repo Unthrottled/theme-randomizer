@@ -4,6 +4,7 @@ import com.intellij.ide.CommonActionsManager
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.ui.LafManager
+import com.intellij.ide.ui.UIThemeProvider
 import com.intellij.ide.ui.laf.UIThemeBasedLookAndFeelInfo
 import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo
 import com.intellij.ide.ui.search.SearchUtil
@@ -11,6 +12,7 @@ import com.intellij.ide.ui.search.SearchableOptionsRegistrar
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.extensions.PluginDescriptor
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.packageDependencies.ui.TreeExpansionMonitor
 import com.intellij.ui.CheckboxTree
@@ -24,6 +26,8 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.tree.TreeUtil
 import io.unthrottled.theme.randomizer.MyBundle
+import io.unthrottled.theme.randomizer.themes.getId
+import io.unthrottled.theme.randomizer.tools.runSafelyWithResult
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.awt.BorderLayout
 import java.awt.EventQueue
@@ -38,9 +42,27 @@ import javax.swing.UIManager
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
 
+data class ThemeData(
+  val laf: UIManager.LookAndFeelInfo,
+  val provider: UIThemeProvider?
+) {
+  val displayName: String = laf.name + extractPluginName(this)
+  private fun extractPluginName(userObject: ThemeData): String {
+    return runSafelyWithResult({
+      val provider = userObject.provider ?: return@runSafelyWithResult ""
+      val field = provider.javaClass.getDeclaredField("pluginDescriptor")
+      field.isAccessible = true
+      val descriptor: PluginDescriptor = field.get(provider) as PluginDescriptor
+      " (provided by: ${descriptor.name})"
+    }) {
+      ""
+    }
+  }
+}
+
 data class ThemeGroupData(
   val name: String,
-  val lookAndFeels: List<UIManager.LookAndFeelInfo>
+  val lookAndFeels: List<ThemeData>
 )
 
 @Suppress("TooManyFunctions") // cuz I said so.
@@ -144,7 +166,7 @@ class PreferredLAFTree(
 
     var result: List<ThemeGroupData> =
       getThemeList {
-        it.name.contains(filter, ignoreCase = true)
+        it.displayName.contains(filter, ignoreCase = true)
       }
 
     val filters = SearchableOptionsRegistrar.getInstance().getProcessedWords(filter)
@@ -166,16 +188,22 @@ class PreferredLAFTree(
     reset(copyAndSort(getThemeList()))
   }
 
-  private fun getThemeList(predicate: (UIManager.LookAndFeelInfo) -> Boolean = { true }) =
-    LafManager.getInstance().installedLookAndFeels
+  private fun getThemeList(predicate: (ThemeData) -> Boolean = { true }): List<ThemeGroupData> {
+    val extensionList = UIThemeProvider.EP_NAME.extensionList
+      .associateBy { it.id }
+    return LafManager.getInstance().installedLookAndFeels
+      .map {
+        ThemeData(it, extensionList[it.getId()])
+      }
       .filter(predicate)
-      .sortedBy { it.name }
+      .sortedBy { it.laf.name }
       .groupBy {
-        it.isDark()
+        it.laf.isDark()
       }
       .map {
         ThemeGroupData(if (it.key) "Dark Themes" else "Light Themes", it.value)
       }
+  }
 
   private fun reset(sortedThemeData: List<ThemeGroupData>) {
     if (!EventQueue.isDispatchThread()) {
@@ -188,11 +216,11 @@ class PreferredLAFTree(
       val themeRoot = CheckedTreeNode(themeData.name)
       themeData.lookAndFeels.forEach { uiLookAndFeel ->
         val themeNode = CheckedTreeNode(uiLookAndFeel)
-        themeNode.isChecked = selectionPredicate.test(uiLookAndFeel)
+        themeNode.isChecked = selectionPredicate.test(uiLookAndFeel.laf)
         treeModel.insertNodeInto(themeNode, themeRoot, themeRoot.childCount)
       }
       themeRoot.isChecked = themeData.lookAndFeels.all { lookAndFeelInfo ->
-        selectionPredicate.test(lookAndFeelInfo)
+        selectionPredicate.test(lookAndFeelInfo.laf)
       }
       treeModel.insertNodeInto(themeRoot, root, root.childCount)
     }
@@ -301,9 +329,11 @@ class PreferredLAFTree(
     private fun getNodeText(node: CheckedTreeNode): String =
       when (val userObject = node.userObject) {
         is UIManager.LookAndFeelInfo -> userObject.name
+        is ThemeData -> userObject.displayName
         is String -> userObject
         else -> "???"
       }
+
 
     private fun getSelectedThemes(root: CheckedTreeNode): List<UIManager.LookAndFeelInfo> {
       val selectedThemes = LinkedList<UIManager.LookAndFeelInfo>()
