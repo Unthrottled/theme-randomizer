@@ -2,6 +2,12 @@
 
 # Theme Randomizer Changelog
 
+# 0.8.2
+
+### Fixed
+
+- Deprecated & Internal JetBrains Platform API usage.
+
 # 0.8.1
 
 ### Added

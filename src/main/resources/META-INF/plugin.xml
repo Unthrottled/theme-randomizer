@@ -20,13 +20,12 @@
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeSelectionService"/>
     <notificationGroup displayType="BALLOON" id="Theme Randomizer Updates" toolWindowId="Theme Randomizer Updates" isLogByDefault="false" />
     <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
+    <postStartupActivity implementation="io.unthrottled.theme.randomizer.listeners.MyPostStartupActivity" />
   </extensions>
 
   <applicationListeners>
     <listener class="io.unthrottled.theme.randomizer.listeners.IDEPluginInstallListener"
               topic="com.intellij.ide.plugins.DynamicPluginListener"/>
-    <listener class="io.unthrottled.theme.randomizer.listeners.MyProjectManagerListener"
-              topic="com.intellij.openapi.project.ProjectManagerListener"/>
     <listener class="io.unthrottled.theme.randomizer.themes.ThemeSelectionConfigListener"
               topic="io.unthrottled.theme.randomizer.config.ConfigListener"/>
   </applicationListeners>

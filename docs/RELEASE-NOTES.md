@@ -6,3 +6,7 @@
 ### Changed
 
 - Lowest supported build to 2021.1
+
+### Fixed
+
+- Deprecated & Internal JetBrains Platform API usage.

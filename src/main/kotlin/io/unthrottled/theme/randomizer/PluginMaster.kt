@@ -4,14 +4,13 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.project.ProjectManagerListener
 import io.unthrottled.theme.randomizer.onboarding.UserOnBoarding
 import io.unthrottled.theme.randomizer.services.LAFProbabilityService
 import io.unthrottled.theme.randomizer.system.match.SystemMatchManager
 import io.unthrottled.theme.randomizer.timed.ThemeChangeEventEmitter
 import io.unthrottled.theme.randomizer.tools.Logging
 
-class PluginMaster : ProjectManagerListener, Disposable, Logging {
+class PluginMaster : Disposable, Logging {
 
   companion object {
     val instance: PluginMaster
@@ -25,15 +24,12 @@ class PluginMaster : ProjectManagerListener, Disposable, Logging {
 
   private val themeChangeEventEmitter = ThemeChangeEventEmitter()
 
-  override fun projectOpened(project: Project) {
+  fun projectOpened(project: Project) {
     registerListenersForProject(project)
   }
 
   private fun registerListenersForProject(project: Project) {
     UserOnBoarding.attemptToPerformNewUpdateActions(project)
-  }
-
-  override fun projectClosed(project: Project) {
   }
 
   override fun dispose() {
