@@ -12,7 +12,6 @@ import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.FileUtilRt
-import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.Consumer
 import com.intellij.util.text.DateFormatUtil
 import io.sentry.Sentry
@@ -100,7 +99,6 @@ class ErrorReporter : ErrorReportSubmitter() {
       setExtra("GC", getGC())
       setExtra("Memory", Runtime.getRuntime().maxMemory() / FileUtilRt.MEGABYTE)
       setExtra("Cores", Runtime.getRuntime().availableProcessors())
-      setExtra("Registry", getRegistry())
       setExtra("Non-Bundled Plugins", getNonBundledPlugins())
       setExtra("Current LAF", LafManager.getInstance().currentLookAndFeel?.name ?: "")
       setExtra("Plugin Config", gson.toJson(Config.instance))
@@ -127,9 +125,6 @@ class ErrorReporter : ErrorReportSubmitter() {
       .filter { p -> !p.isBundled && p.isEnabled }
       .map { p -> p.pluginId.idString }.collect(Collectors.joining(","))
   }
-
-  private fun getRegistry() = Registry.getAll().stream().filter { it.isChangedFromDefault }
-    .map { v -> v.key + "=" + v.asString() }.collect(Collectors.joining(","))
 
   private fun getGC() = ManagementFactory.getGarbageCollectorMXBeans().stream()
     .map { it.name }.collect(Collectors.joining(","))
