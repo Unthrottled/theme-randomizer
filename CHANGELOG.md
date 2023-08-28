@@ -2,6 +2,14 @@
 
 # Theme Randomizer Changelog
 
+
+# 0.8.3
+
+### Added
+
+- Initial 2023.1 build support.
+
+
 # 0.8.2
 
 ### Fixed

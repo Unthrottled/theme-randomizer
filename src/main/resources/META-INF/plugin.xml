@@ -3,12 +3,13 @@
   <name>Theme Randomizer</name>
   <vendor>Unthrottled</vendor>
 
-  <!-- Product and plugin compatibility requirements -->
+  <!-- Product and plugin compatibility requirementsR -->
   <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable id="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
+                             displayName="Theme Randomizer"
                              instance="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
                              groupId="appearance"
     />
