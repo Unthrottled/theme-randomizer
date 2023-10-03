@@ -18,7 +18,7 @@ object BalloonTools {
     return Pair(ideFrame, notificationPosition)
   }
 
-  fun getIDEFrame(project: Project) =
+  private fun getIDEFrame(project: Project) =
     (
       WindowManager.getInstance().getIdeFrame(project)
         ?: WindowManager.getInstance().allProjectFrames.first()

@@ -2,7 +2,7 @@ package io.unthrottled.theme.randomizer
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.ProjectManager
 import io.unthrottled.theme.randomizer.onboarding.UserOnBoarding
 import io.unthrottled.theme.randomizer.services.LAFProbabilityService
@@ -10,6 +10,7 @@ import io.unthrottled.theme.randomizer.system.match.SystemMatchManager
 import io.unthrottled.theme.randomizer.timed.ThemeChangeEventEmitter
 import io.unthrottled.theme.randomizer.tools.Logging
 
+@Service(Service.Level.APP)
 class PluginMaster : Disposable, Logging {
 
   companion object {
@@ -24,12 +25,12 @@ class PluginMaster : Disposable, Logging {
 
   private val themeChangeEventEmitter = ThemeChangeEventEmitter()
 
-  fun projectOpened(project: Project) {
-    registerListenersForProject(project)
+  fun projectOpened() {
+    registerListenersForProject()
   }
 
-  private fun registerListenersForProject(project: Project) {
-    UserOnBoarding.attemptToPerformNewUpdateActions(project)
+  private fun registerListenersForProject() {
+    UserOnBoarding.attemptToPerformNewUpdateActions()
   }
 
   override fun dispose() {
@@ -38,7 +39,6 @@ class PluginMaster : Disposable, Logging {
   }
 
   fun onUpdate() {
-    ProjectManager.getInstance().openProjects
-      .forEach { registerListenersForProject(it) }
+    repeat(ProjectManager.getInstance().openProjects.count()) { registerListenersForProject() }
   }
 }

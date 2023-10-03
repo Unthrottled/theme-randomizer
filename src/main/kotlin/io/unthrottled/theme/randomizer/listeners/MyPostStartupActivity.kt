@@ -6,6 +6,6 @@ import io.unthrottled.theme.randomizer.PluginMaster
 
 internal class MyPostStartupActivity : StartupActivity {
   override fun runActivity(project: Project) {
-    PluginMaster.instance.projectOpened(project)
+    PluginMaster.instance.projectOpened()
   }
 }
