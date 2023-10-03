@@ -7,8 +7,7 @@ import io.unthrottled.theme.randomizer.config.Config
 import io.unthrottled.theme.randomizer.config.ui.isDark
 import io.unthrottled.theme.randomizer.services.LAFProbabilityService
 import io.unthrottled.theme.randomizer.tools.toOptional
-import java.util.Collections
-import java.util.Optional
+import java.util.*
 import javax.swing.UIManager
 import kotlin.math.abs
 
@@ -18,12 +17,13 @@ class ThemeService : Disposable {
       get() = ApplicationManager.getApplication().getService(ThemeService::class.java)
   }
 
+  @Suppress("UnstableApiUsage")
   private fun getRandomTheme(
     selectableThemeType: SelectableThemeType
-  ): Optional<UIManager.LookAndFeelInfo> {
-    val currentLaf = LafManager.getInstance().currentLookAndFeel
+  ): Optional<out UIManager.LookAndFeelInfo>? {
+    val currentLaf = LafManager.getInstance().currentUIThemeLookAndFeel
     return LAFProbabilityService.instance.pickAssetFromList(
-      getPreferredThemes(selectableThemeType).filter { it.getId() != currentLaf.getId() }
+      getPreferredThemes(selectableThemeType).filter { it.getId() != currentLaf.id }
     )
   }
 
@@ -70,7 +70,7 @@ class ThemeService : Disposable {
   override fun dispose() {}
   fun nextTheme(
     selectableThemeType: SelectableThemeType = SelectableThemeType.ANY
-  ): Optional<UIManager.LookAndFeelInfo> {
+  ): Optional<out UIManager.LookAndFeelInfo>? {
     // only want to check for theme selection updates when the next theme is being selected
     ThemeSelectionService.instance.reHydrateSelections()
     return if (Config.instance.isRandomOrder) {

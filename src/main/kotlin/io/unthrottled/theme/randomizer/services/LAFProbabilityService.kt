@@ -55,7 +55,7 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     Random(System.currentTimeMillis())
   )
 
-  fun pickAssetFromList(themes: Collection<UIManager.LookAndFeelInfo>): Optional<UIManager.LookAndFeelInfo> {
+  fun pickAssetFromList(themes: Collection<UIManager.LookAndFeelInfo>): Optional<out UIManager.LookAndFeelInfo>? {
     val seenTimes = themes.map { getSeenCount(it) }
     val maxSeen = seenTimes.stream().mapToInt { it }.max().orElse(0)
     val totalItems = themes.size

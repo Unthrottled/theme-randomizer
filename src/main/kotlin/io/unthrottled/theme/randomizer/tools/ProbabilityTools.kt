@@ -1,12 +1,12 @@
 package io.unthrottled.theme.randomizer.tools
 
-import java.util.Optional
+import java.util.*
 import kotlin.random.Random
 
 class ProbabilityTools(
   private val random: Random
 ) {
-  fun <T> pickFromWeightedList(weightedList: List<Pair<T, Long>>): Optional<T> {
+  fun <T> pickFromWeightedList(weightedList: List<Pair<T, Long>>): Optional<out T>? {
     val totalWeight = weightedList.sumOf { it.second }
     return pickFromWeightedList(
       random.nextLong(1, if (totalWeight <= 1) 2 else totalWeight),
@@ -17,7 +17,7 @@ class ProbabilityTools(
   private fun <T> pickFromWeightedList(
     weightChosen: Long,
     weightedEmotions: List<Pair<T, Long>>
-  ): Optional<T> {
+  ): Optional<out T>? {
     var randomWeight = weightChosen
     for ((mood, weight) in weightedEmotions) {
       if (randomWeight <= weight) {
