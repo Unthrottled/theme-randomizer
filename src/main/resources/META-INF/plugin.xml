@@ -14,7 +14,6 @@
                              groupId="appearance"
     />
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
-    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.services.LAFProbabilityService"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.PluginMaster"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeGatekeeper"/>
     <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeService"/>

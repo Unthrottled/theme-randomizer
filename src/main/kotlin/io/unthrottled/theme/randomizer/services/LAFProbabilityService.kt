@@ -3,12 +3,14 @@ package io.unthrottled.theme.randomizer.services
 import com.intellij.ide.IdeEventQueue
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
+import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import io.unthrottled.theme.randomizer.themes.getId
 import io.unthrottled.theme.randomizer.tools.AlarmDebouncer
 import io.unthrottled.theme.randomizer.tools.ProbabilityTools
-import java.util.Optional
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.swing.UIManager
 import kotlin.math.abs
@@ -16,8 +18,8 @@ import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.random.Random
 
+@Service(Service.Level.APP)
 class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
-
   companion object {
     val instance: LAFProbabilityService
       get() = ApplicationManager.getApplication().getService(LAFProbabilityService::class.java)
@@ -83,8 +85,9 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     IdeEventQueue.getInstance().removeIdleListener(this)
   }
 
-  private fun onChanged(lookAndFeelInfo: UIManager.LookAndFeelInfo) {
-    val themeId = lookAndFeelInfo.getId()
+  @Suppress("UnstableApiUsage")
+  private fun onChanged(lookAndFeelInfo: UIThemeLookAndFeelInfo) {
+    val themeId = lookAndFeelInfo.id
     seenAssetLedger.assetSeenCounts[themeId] =
       getAssetSeenCount(themeId) + 1
   }
@@ -107,8 +110,9 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     }
   }
 
+  @Suppress("UnstableApiUsage")
   override fun lookAndFeelChanged(source: LafManager) {
-    val currentTheme = source.currentLookAndFeel
+    val currentTheme = source.currentUIThemeLookAndFeel
     debouncer.debounce {
       onChanged(currentTheme)
     }
