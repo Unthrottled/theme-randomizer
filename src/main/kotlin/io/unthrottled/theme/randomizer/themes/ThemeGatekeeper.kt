@@ -1,31 +1,32 @@
 package io.unthrottled.theme.randomizer.themes
 
+import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import javax.swing.UIManager
 
+@Suppress("UnstableApiUsage")
 class ThemeGatekeeper : Disposable {
   companion object {
     val instance: ThemeGatekeeper
       get() = ApplicationManager.getApplication().getService(ThemeGatekeeper::class.java)
 
     @JvmStatic
-    fun getId(lookAndFeelInfo: UIManager.LookAndFeelInfo): String =
-      lookAndFeelInfo.getId()
+    fun getId(lookAndFeelInfo: UIThemeLookAndFeelInfo): String =
+      lookAndFeelInfo.id
   }
 
-  fun isLegit(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
+  fun isLegit(lookAndFeelInfo: UIThemeLookAndFeelInfo): Boolean =
     !isBlackListed(lookAndFeelInfo) &&
       (ThemeSelectionService.instance.preferredThemeIds.isEmpty() || isPreferred(lookAndFeelInfo))
 
-  fun isPreferred(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
+  fun isPreferred(lookAndFeelInfo: UIThemeLookAndFeelInfo): Boolean =
     ThemeSelectionService.instance.preferredThemeIds.contains(
-      lookAndFeelInfo.getId()
+      lookAndFeelInfo.id
     )
 
-  fun isBlackListed(lookAndFeelInfo: UIManager.LookAndFeelInfo): Boolean =
+  fun isBlackListed(lookAndFeelInfo: UIThemeLookAndFeelInfo): Boolean =
     ThemeSelectionService.instance.blackListedThemeIds.contains(
-      lookAndFeelInfo.getId()
+      lookAndFeelInfo.id
     )
 
   override fun dispose() {

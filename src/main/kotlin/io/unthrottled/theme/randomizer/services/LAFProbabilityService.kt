@@ -7,7 +7,6 @@ import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
-import io.unthrottled.theme.randomizer.themes.getId
 import io.unthrottled.theme.randomizer.tools.AlarmDebouncer
 import io.unthrottled.theme.randomizer.tools.ProbabilityTools
 import java.util.*
@@ -18,6 +17,7 @@ import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.random.Random
 
+@Suppress("UnstableApiUsage")
 @Service(Service.Level.APP)
 class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
   companion object {
@@ -55,7 +55,7 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     Random(System.currentTimeMillis())
   )
 
-  fun pickAssetFromList(themes: Collection<UIManager.LookAndFeelInfo>): Optional<out UIManager.LookAndFeelInfo>? {
+  fun pickAssetFromList(themes: Collection<UIThemeLookAndFeelInfo>): Optional<out UIThemeLookAndFeelInfo>? {
     val seenTimes = themes.map { getSeenCount(it) }
     val maxSeen = seenTimes.stream().mapToInt { it }.max().orElse(0)
     val totalItems = themes.size
@@ -76,8 +76,8 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
   // been seen by the user during the ledger cycle duration see:
   // <code>MAX_ALLOWED_DAYS_PERSISTED</code> in AssetObservationService for
   // more details
-  private fun getSeenCount(it: UIManager.LookAndFeelInfo) =
-    seenAssetLedger.assetSeenCounts.getOrDefault(it.getId(), 0)
+  private fun getSeenCount(it: UIThemeLookAndFeelInfo) =
+    seenAssetLedger.assetSeenCounts.getOrDefault(it.id, 0)
 
   override fun dispose() {
     messageBusConnection.dispose()

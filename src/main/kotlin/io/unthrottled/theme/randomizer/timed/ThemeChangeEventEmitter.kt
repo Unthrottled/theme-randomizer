@@ -1,9 +1,12 @@
+@file:Suppress("UnstableApiUsage")
+
 package io.unthrottled.theme.randomizer.timed
 
 import com.intellij.ide.IdeEventQueue
 import com.intellij.ide.actions.QuickChangeLookAndFeel
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
+import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.util.Alarm
@@ -14,7 +17,6 @@ import io.unthrottled.theme.randomizer.mode.PluginMode
 import io.unthrottled.theme.randomizer.mode.getCurrentSelectableThemeType
 import io.unthrottled.theme.randomizer.mode.toPluginMode
 import io.unthrottled.theme.randomizer.themes.ThemeService
-import io.unthrottled.theme.randomizer.themes.getId
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -107,13 +109,13 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     IdeEventQueue.getInstance().removeIdleListener(reSubscriber)
   }
 
-  private var themeSet = LafManager.getInstance().currentLookAndFeel
+  private var themeSet: UIThemeLookAndFeelInfo = LafManager.getInstance().currentUIThemeLookAndFeel
 
   override fun run() {
     if (Config.instance.isChangeTheme.not() || isTime(Config.instance).not()) return
 
     ThemeService.instance.nextTheme(getCurrentSelectableThemeType())
-      .ifPresent {
+      ?.ifPresent {
         QuickChangeLookAndFeel.switchLafAndUpdateUI(
           LafManager.getInstance(),
           it,
@@ -152,8 +154,8 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   }
 
   override fun lookAndFeelChanged(source: LafManager) {
-    val currentLookAndFeel = source.currentLookAndFeel
-    if (currentLookAndFeel.getId() != themeSet.getId()) {
+    val currentLookAndFeel = source.currentUIThemeLookAndFeel
+    if (currentLookAndFeel.id != themeSet.id) {
       themeSet = currentLookAndFeel
       captureTimestamp()
     }
