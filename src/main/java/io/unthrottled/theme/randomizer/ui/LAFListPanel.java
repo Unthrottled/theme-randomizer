@@ -1,21 +1,22 @@
 package io.unthrottled.theme.randomizer.ui;
 
+import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo;
 import com.intellij.ui.GuiUtils;
 import io.unthrottled.theme.randomizer.config.ui.PreferredLAFTree;
 
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 import java.util.function.Predicate;
 
+@SuppressWarnings("UnstableApiUsage")
 public final class LAFListPanel {
   private final PreferredLAFTree myLAFTree;
   private JPanel myPanel;
   private JPanel myTreePanel;
 
   public LAFListPanel(
-    Predicate<UIManager.LookAndFeelInfo> selectionPredicate
+    Predicate<UIThemeLookAndFeelInfo> selectionPredicate
   ) {
     myLAFTree = new PreferredLAFTree(selectionPredicate);
     myTreePanel.setLayout(new BorderLayout());
@@ -28,7 +29,7 @@ public final class LAFListPanel {
     myLAFTree.reset();
   }
 
-  public List<UIManager.LookAndFeelInfo> getSelected() {
+  public List<UIThemeLookAndFeelInfo> getSelected() {
     return myLAFTree.getSelected();
   }
 

@@ -1,11 +1,12 @@
+@file:Suppress("UnstableApiUsage")
+
 package io.unthrottled.theme.randomizer.config.ui
 
 import com.intellij.ide.CommonActionsManager
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.ui.LafManager
-import com.intellij.ide.ui.laf.UIThemeBasedLookAndFeelInfo
-import com.intellij.ide.ui.laf.darcula.DarculaLookAndFeelInfo
+import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
 import com.intellij.ide.ui.search.SearchUtil
 import com.intellij.ide.ui.search.SearchableOptionsRegistrar
 import com.intellij.openapi.actionSystem.ActionManager
@@ -13,12 +14,8 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.packageDependencies.ui.TreeExpansionMonitor
-import com.intellij.ui.CheckboxTree
+import com.intellij.ui.*
 import com.intellij.ui.CheckboxTree.CheckboxTreeCellRenderer
-import com.intellij.ui.CheckedTreeNode
-import com.intellij.ui.FilterComponent
-import com.intellij.ui.ScrollPaneFactory
-import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
@@ -27,25 +24,24 @@ import io.unthrottled.theme.randomizer.MyBundle
 import io.unthrottled.theme.randomizer.tools.toOptional
 import java.awt.BorderLayout
 import java.awt.EventQueue
-import java.util.LinkedList
+import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.SwingUtilities
-import javax.swing.UIManager
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
 
 data class ThemeGroupData(
   val name: String,
-  val lookAndFeels: List<UIManager.LookAndFeelInfo>
+  val lookAndFeels: List<UIThemeLookAndFeelInfo>
 )
 
 @Suppress("TooManyFunctions") // cuz I said so.
 class PreferredLAFTree(
-  private val selectionPredicate: Predicate<UIManager.LookAndFeelInfo>
+  private val selectionPredicate: Predicate<UIThemeLookAndFeelInfo>
 ) {
   private val themeCheckStatus: MutableMap<String, Boolean> = HashMap()
   val component: JComponent = JPanel(BorderLayout())
@@ -166,21 +162,17 @@ class PreferredLAFTree(
     reset(copyAndSort(getThemeList()))
   }
 
-  private fun getThemeList(predicate: (UIManager.LookAndFeelInfo) -> Boolean = { true }) =
-    LafManager.getInstance().installedLookAndFeels
+  private fun getThemeList(predicate: (UIThemeLookAndFeelInfo) -> Boolean = { true }) =
+    LafManager.getInstance().installedThemes
       .filter(predicate)
       .sortedBy { it.name }
-      .groupBy {
-        it.isDark()
-      }
+      .groupBy { it.isDark }
       .map {
         ThemeGroupData(if (it.key) "Dark Themes" else "Light Themes", it.value)
       }
 
   private fun reset(sortedThemeData: List<ThemeGroupData>) {
-    if (!EventQueue.isDispatchThread()) {
-      return
-    }
+    if (!EventQueue.isDispatchThread()) return
 
     val root = CheckedTreeNode(null)
     val treeModel = myTree.model as DefaultTreeModel
@@ -205,12 +197,11 @@ class PreferredLAFTree(
   private val root: CheckedTreeNode
     get() = myTree.model.root as CheckedTreeNode
 
-  fun getSelected(): List<UIManager.LookAndFeelInfo> =
-    getSelectedThemes(root)
+  fun getSelected(): List<UIThemeLookAndFeelInfo> = getSelectedThemes(root)
 
   private fun refreshCheckStatus(root: CheckedTreeNode) {
     when (val userObject = root.userObject) {
-      is UIManager.LookAndFeelInfo -> themeCheckStatus[userObject.name] = root.isChecked
+      is UIThemeLookAndFeelInfo -> themeCheckStatus[userObject.name] = root.isChecked
       else -> visitChildren(root) { refreshCheckStatus(it) }
     }
   }
@@ -224,9 +215,7 @@ class PreferredLAFTree(
 
   private fun getAllNodes(): Stream<CheckedTreeNode> {
     val bob = Stream.builder<CheckedTreeNode>()
-    traverseTree(root) {
-      bob.add(it)
-    }
+    traverseTree(root, bob::add)
     return bob.build()
   }
 
@@ -251,9 +240,8 @@ class PreferredLAFTree(
         myExpansionMonitor.freeze()
       }
       this@PreferredLAFTree.filter(filterModel(filter, true))
-      val expandedPaths = TreeUtil.collectExpandedPaths(
-        myTree
-      )
+      val expandedPaths = TreeUtil.collectExpandedPaths(myTree)
+
       (myTree.model as DefaultTreeModel).reload()
       TreeUtil.restoreExpandedPaths(myTree, expandedPaths)
       SwingUtilities.invokeLater {
@@ -266,6 +254,7 @@ class PreferredLAFTree(
         }
       }
       TreeUtil.expandAll(myTree)
+
       if (filter.isNullOrEmpty()) {
         TreeUtil.collapseAll(myTree, 0)
         myExpansionMonitor.restore()
@@ -300,16 +289,16 @@ class PreferredLAFTree(
 
     private fun getNodeText(node: CheckedTreeNode): String =
       when (val userObject = node.userObject) {
-        is UIManager.LookAndFeelInfo -> userObject.name
+        is UIThemeLookAndFeelInfo -> userObject.name
         is String -> userObject
         else -> "???"
       }
 
-    private fun getSelectedThemes(root: CheckedTreeNode): List<UIManager.LookAndFeelInfo> {
-      val selectedThemes = LinkedList<UIManager.LookAndFeelInfo>()
+    private fun getSelectedThemes(root: CheckedTreeNode): List<UIThemeLookAndFeelInfo> {
+      val selectedThemes = LinkedList<UIThemeLookAndFeelInfo>()
       traverseTree(root) {
         val userObject = it.userObject
-        if (it.isChecked && userObject is UIManager.LookAndFeelInfo) {
+        if (it.isChecked && userObject is UIThemeLookAndFeelInfo) {
           selectedThemes.push(userObject)
         }
       }
@@ -332,10 +321,10 @@ class PreferredLAFTree(
 
     private fun isModified(
       root: CheckedTreeNode,
-      selectionPredicate: Predicate<UIManager.LookAndFeelInfo>
+      selectionPredicate: Predicate<UIThemeLookAndFeelInfo>
     ): Boolean {
       val userObject = root.userObject
-      return if (userObject is UIManager.LookAndFeelInfo) {
+      return if (userObject is UIThemeLookAndFeelInfo) {
         val enabled = selectionPredicate.test(userObject)
         enabled != root.isChecked
       } else {
@@ -363,10 +352,3 @@ class PreferredLAFTree(
     initTree()
   }
 }
-
-fun UIManager.LookAndFeelInfo.isDark(): Boolean =
-  if (this is UIThemeBasedLookAndFeelInfo) {
-    this.theme.isDark
-  } else {
-    this is DarculaLookAndFeelInfo
-  }

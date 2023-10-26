@@ -1,8 +1,11 @@
+@file:Suppress("UnstableApiUsage")
+
 package io.unthrottled.theme.randomizer.system.match
 
 import com.intellij.ide.actions.QuickChangeLookAndFeel
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.laf.SystemDarkThemeDetector
+import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -14,10 +17,8 @@ import io.unthrottled.theme.randomizer.mode.toPluginMode
 import io.unthrottled.theme.randomizer.themes.SelectableThemeType
 import io.unthrottled.theme.randomizer.themes.ThemeGatekeeper
 import io.unthrottled.theme.randomizer.themes.ThemeService
-import io.unthrottled.theme.randomizer.themes.getId
 import io.unthrottled.theme.randomizer.tools.toOptional
-import java.util.Optional
-import javax.swing.UIManager
+import java.util.*
 
 internal enum class SystemStateObservation {
   CHANGED, SAME,
@@ -27,7 +28,7 @@ enum class SystemType(val selectableThemeType: SelectableThemeType) {
   DARK(SelectableThemeType.DARK), LIGHT(SelectableThemeType.LIGHT);
 
   companion object {
-    private val nameToType = values().associateBy { it.toString() }
+    private val nameToType = entries.associateBy { it.toString() }
 
     fun fromStringValue(value: String?): SystemType? =
       if (value == null) null else nameToType[value]
@@ -123,8 +124,8 @@ object SystemMatchManager : Disposable {
     } else {
       restorePreviousTheme(currentSystemType)
     }
-      .ifPresent { lookAndFeel ->
-        rememberTheme(currentSystemType, lookAndFeel)
+      ?.ifPresent { lookAndFeel ->
+        rememberTheme(currentSystemType, lookAndFeel as UIThemeLookAndFeelInfo)
         QuickChangeLookAndFeel.switchLafAndUpdateUI(
           LafManager.getInstance(),
           lookAndFeel,
@@ -133,11 +134,11 @@ object SystemMatchManager : Disposable {
       }
   }
 
-  private fun rememberTheme(currentSystemType: SystemType, lookAndFeel: UIManager.LookAndFeelInfo) {
+  private fun rememberTheme(currentSystemType: SystemType, lookAndFeel: UIThemeLookAndFeelInfo) {
     val propertyKey = getPreviousThemePropertyKey(currentSystemType)
     PropertiesComponent.getInstance().setValue(
       propertyKey,
-      lookAndFeel.getId()
+      lookAndFeel.id
     )
   }
 
@@ -147,14 +148,14 @@ object SystemMatchManager : Disposable {
       SystemType.LIGHT -> "randomizer.system.match.light.previous"
     }
 
-  private fun restorePreviousTheme(currentSystemType: SystemType): Optional<UIManager.LookAndFeelInfo> {
+  private fun restorePreviousTheme(currentSystemType: SystemType): Optional<UIThemeLookAndFeelInfo> {
     val previousThemeKey = getPreviousThemePropertyKey(currentSystemType)
     return PropertiesComponent.getInstance()
       .getValue(previousThemeKey).toOptional()
       .flatMap { themeId ->
-        LafManager.getInstance().installedLookAndFeels
+        LafManager.getInstance().installedThemes
           .firstOrNull { laf ->
-            laf.getId() == themeId
+            laf.id == themeId
           }
           .toOptional()
       }
@@ -162,7 +163,7 @@ object SystemMatchManager : Disposable {
       .map { it.toOptional() }
       // if the property key or the saved theme isn't installed
       // pick another theme...
-      .orElseGet { ThemeService.instance.nextTheme(currentSystemType.selectableThemeType) }
+      .orElseGet { ThemeService.instance.nextTheme(currentSystemType.selectableThemeType) as Optional<UIThemeLookAndFeelInfo>? }
   }
 
   private fun shouldChooseNewTheme(currentSystemType: SystemType): Boolean =

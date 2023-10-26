@@ -11,7 +11,6 @@ import io.unthrottled.theme.randomizer.tools.AlarmDebouncer
 import io.unthrottled.theme.randomizer.tools.ProbabilityTools
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.swing.UIManager
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.pow
@@ -28,7 +27,7 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     private const val THEME_DEBOUNCE_DURATION_IN_MINUTES = 2L
   }
 
-  private val debouncer = AlarmDebouncer<UIManager.LookAndFeelInfo>(
+  private val debouncer = AlarmDebouncer<UIThemeLookAndFeelInfo>(
     TimeUnit.MILLISECONDS.convert(
       THEME_DEBOUNCE_DURATION_IN_MINUTES,
       TimeUnit.MINUTES

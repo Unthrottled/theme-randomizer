@@ -13,7 +13,7 @@ class NextTheme : AnAction() {
     val themeSelection = getCurrentSelectableThemeType()
 
     ThemeService.instance.nextTheme(themeSelection)
-      .ifPresent {
+      ?.ifPresent {
         QuickChangeLookAndFeel.switchLafAndUpdateUI(
           LafManager.getInstance(),
           it,
