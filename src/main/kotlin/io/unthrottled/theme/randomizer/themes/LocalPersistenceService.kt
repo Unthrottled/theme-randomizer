@@ -18,40 +18,25 @@ abstract class LocalPersistenceService<T>(
 ) {
   private val log = Logger.getInstance(this::class.java)
 
-  private val gson = GsonBuilder()
-    .create()
+  private val gson = GsonBuilder().create()
 
-  private val ledgerPath = LocalStorageService.constructLocalContentPath(
-    AssetCategory.META,
-    fileName
-  )
+  private val ledgerPath = LocalStorageService.constructLocalContentPath(AssetCategory.META, fileName)
 
-  fun getInitialItem(): T =
-    if (ledgerPath.exists()) {
-      readLedger()
-    } else {
-      buildDefaultLedger()
-    }
+  fun getInitialItem(): T = when {
+    ledgerPath.exists() -> readLedger()
+    else -> buildDefaultLedger()
+  }
 
   protected fun readLedger(): T =
     runSafelyWithResult({
       Files.newInputStream(ledgerPath)
-        .use {
-          gson.fromJson(
-            InputStreamReader(it, StandardCharsets.UTF_8),
-            classType
-          )
-        }
+        .use { gson.fromJson(InputStreamReader(it, StandardCharsets.UTF_8), classType) }
     }) {
       log.warn("Unable to read promotion ledger: $fileName, for raisins.", it)
       buildDefaultLedger()
     }.toOptional()
-      .map { item ->
-        decorateItem(item)
-      }
-      .orElseGet {
-        buildDefaultLedger()
-      }
+      .map(::decorateItem)
+      .orElseGet(::buildDefaultLedger)
 
   protected abstract fun decorateItem(item: T): T
 
@@ -69,9 +54,7 @@ abstract class LocalPersistenceService<T>(
         StandardOpenOption.TRUNCATE_EXISTING
       ).use {
         val mostCurrentLedger = combineWithOnDisk(themeObservationLedger)
-        it.write(
-          gson.toJson(mostCurrentLedger)
-        )
+        it.write(gson.toJson(mostCurrentLedger))
         mostCurrentLedger
       }
     }) {

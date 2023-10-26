@@ -20,13 +20,10 @@ class ProbabilityTools(
   ): Optional<out T>? {
     var randomWeight = weightChosen
     for ((mood, weight) in weightedEmotions) {
-      if (randomWeight <= weight) {
-        return mood.toOptional()
-      }
+      if (randomWeight <= weight) return mood.toOptional()
       randomWeight -= weight
     }
 
-    return weightedEmotions.first { it.second > 0 }.toOptional()
-      .map { it.first }
+    return weightedEmotions.first { it.second > 0 }.toOptional().map { it.first }
   }
 }

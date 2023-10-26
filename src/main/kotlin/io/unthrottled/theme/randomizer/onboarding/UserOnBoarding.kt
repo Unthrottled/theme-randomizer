@@ -8,19 +8,14 @@ import io.unthrottled.theme.randomizer.tools.toOptional
 import java.util.*
 
 object UserOnBoarding {
-
   fun attemptToPerformNewUpdateActions() {
-    getNewVersion().ifPresent { newVersion ->
-      Config.instance.version = newVersion
-    }
+    getNewVersion().ifPresent { newVersion -> Config.instance.version = newVersion }
     if (Config.instance.userId.isEmpty()) {
       Config.instance.userId = UUID.randomUUID().toString()
     }
   }
 
-  private fun getNewVersion() =
-    getVersion()
-      .filter { it != Config.instance.version }
+  private fun getNewVersion() = getVersion().filter { it != Config.instance.version }
 
   private fun getVersion(): Optional<String> =
     PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID))

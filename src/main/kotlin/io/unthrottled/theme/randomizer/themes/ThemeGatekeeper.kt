@@ -6,29 +6,25 @@ import com.intellij.openapi.application.ApplicationManager
 
 @Suppress("UnstableApiUsage")
 class ThemeGatekeeper : Disposable {
-  companion object {
-    val instance: ThemeGatekeeper
-      get() = ApplicationManager.getApplication().getService(ThemeGatekeeper::class.java)
-
-    @JvmStatic
-    fun getId(lookAndFeelInfo: UIThemeLookAndFeelInfo): String =
-      lookAndFeelInfo.id
-  }
 
   fun isLegit(lookAndFeelInfo: UIThemeLookAndFeelInfo): Boolean =
     !isBlackListed(lookAndFeelInfo) &&
       (ThemeSelectionService.instance.preferredThemeIds.isEmpty() || isPreferred(lookAndFeelInfo))
 
   fun isPreferred(lookAndFeelInfo: UIThemeLookAndFeelInfo): Boolean =
-    ThemeSelectionService.instance.preferredThemeIds.contains(
-      lookAndFeelInfo.id
-    )
+    ThemeSelectionService.instance.preferredThemeIds.contains(lookAndFeelInfo.id)
 
   fun isBlackListed(lookAndFeelInfo: UIThemeLookAndFeelInfo): Boolean =
-    ThemeSelectionService.instance.blackListedThemeIds.contains(
-      lookAndFeelInfo.id
-    )
+    ThemeSelectionService.instance.blackListedThemeIds.contains(lookAndFeelInfo.id)
 
-  override fun dispose() {
+  override fun dispose() = Unit
+
+  companion object {
+    val instance: ThemeGatekeeper
+      get() = ApplicationManager.getApplication().getService(ThemeGatekeeper::class.java)
+
+    @JvmStatic
+    fun getId(lookAndFeelInfo: UIThemeLookAndFeelInfo): String = lookAndFeelInfo.id
   }
+
 }

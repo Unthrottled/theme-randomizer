@@ -2,7 +2,7 @@ package io.unthrottled.theme.randomizer.config
 
 import io.unthrottled.theme.randomizer.tools.runSafelyWithResult
 import io.unthrottled.theme.randomizer.tools.toOptional
-import java.util.Optional
+import java.util.*
 
 enum class ChangeIntervals {
   THIRTY_MINUTES,
@@ -14,8 +14,6 @@ enum class ChangeIntervals {
 
   companion object {
     fun getValue(value: String): Optional<ChangeIntervals> =
-      runSafelyWithResult({
-        valueOf(value).toOptional()
-      }) { Optional.empty() }
+      runSafelyWithResult({ valueOf(value).toOptional() }) { Optional.empty() }
   }
 }

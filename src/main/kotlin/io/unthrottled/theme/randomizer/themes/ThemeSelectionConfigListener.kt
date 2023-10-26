@@ -9,12 +9,12 @@ import io.unthrottled.theme.randomizer.services.LockMaster.releaseLock
 import io.unthrottled.theme.randomizer.tools.runSafely
 
 class ThemeSelectionConfigListener : ConfigListener {
-
   override fun pluginConfigUpdated(
     config: Config,
     previousConfig: ConfigSettingsModel
   ) {
     ThemeSelectionService.instance.rehydrateSelectionsFromConfig(config)
+
     if (config.isLocalSync) {
       // sync config changes
       runSafely({

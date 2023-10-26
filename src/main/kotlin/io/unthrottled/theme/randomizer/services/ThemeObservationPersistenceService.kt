@@ -18,15 +18,14 @@ data class ThemeObservationLedger(
   val writeDate: Instant
 )
 
-object ThemeObservationService : LocalPersistenceService<ThemeObservationLedger> (
+object ThemeObservationService : LocalPersistenceService<ThemeObservationLedger>(
   "seen-themes-ledger.json",
   ThemeObservationLedger::class.java
 ) {
-
   private const val MAX_ALLOWED_DAYS_PERSISTED = 7L
 
-  override fun decorateItem(item: ThemeObservationLedger): ThemeObservationLedger =
-    if (Duration.between(item.writeDate, Instant.now()).toDays() >= MAX_ALLOWED_DAYS_PERSISTED) {
+  override fun decorateItem(item: ThemeObservationLedger): ThemeObservationLedger = when {
+    Duration.between(item.writeDate, Instant.now()).toDays() >= MAX_ALLOWED_DAYS_PERSISTED -> {
       // reset counts so that way new assets that haven't been seen yet will eventually make
       // it to the ledger. Also enables users to see their favorite (most seen) assets again
       item.copy(
@@ -36,9 +35,11 @@ object ThemeObservationService : LocalPersistenceService<ThemeObservationLedger>
             Collectors.toConcurrentMap({ it.first }, { it.second }) { _, theChosenOne -> theChosenOne }
           )
       )
-    } else {
-      item
     }
+
+    else -> item
+  }
+
   override fun buildDefaultLedger() = ThemeObservationLedger(ConcurrentHashMap(), Instant.now())
 
   override fun combineWithOnDisk(themeObservationLedger: ThemeObservationLedger): ThemeObservationLedger {

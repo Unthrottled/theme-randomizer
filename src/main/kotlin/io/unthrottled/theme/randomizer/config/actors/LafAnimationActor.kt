@@ -7,22 +7,21 @@ import io.unthrottled.theme.randomizer.tools.toOptional
 
 object LafAnimationActor {
   fun enableAnimation(enabled: Boolean) {
-    if (enabled != getAnimationEnabled()) {
-      getAnimationRegistryValue().setValue(enabled)
-      if (enabled) {
-        UpdateNotification.sendMessage(
-          "Theme Transition Animation Enabled",
-          """The animations will remain in your IDE after uninstalling the plugin.
-          |To remove them, un-check this action or toggle the action at
-          |"Help -> Find Action -> ide.intellij.laf.enable.animation".
-          """.trimMargin()
-        )
-      }
-    }
+    if (enabled == getAnimationEnabled()) return
+
+    getAnimationRegistryValue().setValue(enabled)
+    if (!enabled) return
+
+    UpdateNotification.sendMessage(
+      "Theme Transition Animation Enabled",
+      """The animations will remain in your IDE after uninstalling the plugin.
+      |To remove them, un-check this action or toggle the action at
+      |"Help -> Find Action -> ide.intellij.laf.enable.animation".
+      """.trimMargin()
+    )
   }
 
-  private fun getAnimationRegistryValue(): RegistryValue =
-    Registry.get("ide.intellij.laf.enable.animation")
+  private fun getAnimationRegistryValue(): RegistryValue = Registry.get("ide.intellij.laf.enable.animation")
 
   fun getAnimationEnabled(): Boolean =
     getAnimationRegistryValue()

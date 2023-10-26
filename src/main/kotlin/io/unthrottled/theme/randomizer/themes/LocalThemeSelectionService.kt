@@ -11,9 +11,7 @@ object LocalThemeSelectionService : LocalPersistenceService<ThemeSelections>(
   override fun buildDefaultLedger() =
     ThemeSelectionExtractor.extractThemeSelectionsFromConfig(Config.instance)
 
-  override fun combineWithOnDisk(themeObservationLedger: ThemeSelections): ThemeSelections {
-    return themeObservationLedger
-  }
+  override fun combineWithOnDisk(themeObservationLedger: ThemeSelections): ThemeSelections = themeObservationLedger
 
   fun saveSelections(config: Config) {
     persistLedger(ThemeSelectionExtractor.extractThemeSelectionsFromConfig(config))

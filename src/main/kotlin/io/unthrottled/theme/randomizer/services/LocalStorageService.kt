@@ -9,7 +9,7 @@ import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.Optional
+import java.util.*
 
 object LocalStorageService {
   private val log = Logger.getInstance(this::class.java)
@@ -37,14 +37,13 @@ object LocalStorageService {
     }
   }
 
-  fun getContentDirectory(): String =
-    getGlobalConfigAssetDirectory()
-      .orElseGet {
-        Paths.get(
-          PathManager.getConfigPath(),
-          ASSET_DIRECTORY
-        ).toAbsolutePath().toString()
-      }
+  private fun getContentDirectory(): String = getGlobalConfigAssetDirectory()
+    .orElseGet {
+      Paths.get(
+        PathManager.getConfigPath(),
+        ASSET_DIRECTORY
+      ).toAbsolutePath().toString()
+    }
 
   private fun getGlobalConfigAssetDirectory(): Optional<String> =
     Paths.get(
@@ -57,9 +56,7 @@ object LocalStorageService {
       .filter { Files.isWritable(it.parent) }
       .map {
         if (Files.exists(it).not()) {
-          runSafely({
-            Files.createDirectories(it)
-          }) { throwable ->
+          runSafely({ Files.createDirectories(it) }) { throwable ->
             log.warn("Unable to create global directory for raisins", throwable)
           }
         }

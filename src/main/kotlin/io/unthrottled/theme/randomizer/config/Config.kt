@@ -1,9 +1,9 @@
 package io.unthrottled.theme.randomizer.config
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
 import com.intellij.util.xmlb.XmlSerializerUtil.copyBean
 import com.intellij.util.xmlb.XmlSerializerUtil.createCopy
 import io.unthrottled.theme.randomizer.config.actors.LafAnimationActor
@@ -30,25 +30,6 @@ const val DEFAULT_OBSERVATION_COUNT = -1
   storages = [Storage("theme-randomizer.xml")]
 )
 class Config : PersistentStateComponent<Config>, Cloneable {
-  companion object {
-    @JvmStatic
-    val instance: Config
-      get() = ApplicationManager.getApplication().getService(Config::class.java)
-    const val DEFAULT_DELIMITER = ","
-
-    @JvmStatic
-    fun getInitialConfigSettingsModel() = ConfigSettingsModel(
-      interval = instance.interval,
-      isChangeTheme = instance.isChangeTheme,
-      isRandomOrder = instance.isRandomOrder,
-      isThemeTransition = LafAnimationActor.getAnimationEnabled(),
-      pluginMode = instance.pluginMode.toPluginMode(),
-      changeOnSystemSwitches = instance.changeOnSystemSwitches,
-      isLocalSync = instance.isLocalSync,
-      isTimedMatchOS = instance.isTimedMatchOS
-    )
-  }
-
   var interval: String = ChangeIntervals.DAY.toString()
   var isChangeTheme: Boolean = true
   var isRandomOrder: Boolean = true
@@ -68,10 +49,27 @@ class Config : PersistentStateComponent<Config>, Cloneable {
     this.pluginMode = pluginMode.displayName
   }
 
-  override fun getState(): Config? =
-    createCopy(this)
+  override fun getState(): Config? = createCopy(this)
 
-  override fun loadState(state: Config) {
-    copyBean(state, this)
+  override fun loadState(state: Config) = copyBean(state, this)
+
+  companion object {
+    @JvmStatic
+    val instance: Config
+      get() = service()
+
+    const val DEFAULT_DELIMITER = ","
+
+    @JvmStatic
+    fun getInitialConfigSettingsModel() = ConfigSettingsModel(
+      interval = instance.interval,
+      isChangeTheme = instance.isChangeTheme,
+      isRandomOrder = instance.isRandomOrder,
+      isThemeTransition = LafAnimationActor.getAnimationEnabled(),
+      pluginMode = instance.pluginMode.toPluginMode(),
+      changeOnSystemSwitches = instance.changeOnSystemSwitches,
+      isLocalSync = instance.isLocalSync,
+      isTimedMatchOS = instance.isTimedMatchOS
+    )
   }
 }

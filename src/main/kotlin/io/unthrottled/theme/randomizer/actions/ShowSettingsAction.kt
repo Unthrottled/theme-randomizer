@@ -7,9 +7,7 @@ import com.intellij.openapi.project.DumbAware
 import io.unthrottled.theme.randomizer.ui.PluginSettingsUI
 
 class ShowSettingsAction : AnAction(), DumbAware {
-
   override fun actionPerformed(e: AnActionEvent) {
-    ShowSettingsUtil.getInstance()
-      .showSettingsDialog(e.project, PluginSettingsUI::class.java)
+    ShowSettingsUtil.getInstance().showSettingsDialog(e.project, PluginSettingsUI::class.java)
   }
 }

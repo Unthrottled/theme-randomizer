@@ -13,11 +13,6 @@ import io.unthrottled.theme.randomizer.tools.Logging
 @Service(Service.Level.APP)
 class PluginMaster : Disposable, Logging {
 
-  companion object {
-    val instance: PluginMaster
-      get() = ApplicationManager.getApplication().getService(PluginMaster::class.java)
-  }
-
   init {
     LAFProbabilityService.instance.toString() // wake up the look and feel probability service
     SystemMatchManager.init()
@@ -25,20 +20,20 @@ class PluginMaster : Disposable, Logging {
 
   private val themeChangeEventEmitter = ThemeChangeEventEmitter()
 
-  fun projectOpened() {
-    registerListenersForProject()
-  }
+  fun projectOpened() = registerListenersForProject()
 
-  private fun registerListenersForProject() {
-    UserOnBoarding.attemptToPerformNewUpdateActions()
-  }
+  private fun registerListenersForProject() = UserOnBoarding.attemptToPerformNewUpdateActions()
 
   override fun dispose() {
     themeChangeEventEmitter.dispose()
     SystemMatchManager.dispose()
   }
 
-  fun onUpdate() {
-    repeat(ProjectManager.getInstance().openProjects.count()) { registerListenersForProject() }
+  fun onUpdate() = repeat(ProjectManager.getInstance().openProjects.count()) { registerListenersForProject() }
+
+  companion object {
+    val instance: PluginMaster
+      get() = ApplicationManager.getApplication().getService(PluginMaster::class.java)
   }
+
 }

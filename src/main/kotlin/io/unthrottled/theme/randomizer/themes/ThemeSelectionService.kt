@@ -4,10 +4,6 @@ import com.intellij.openapi.application.ApplicationManager
 import io.unthrottled.theme.randomizer.config.Config
 
 class ThemeSelectionService {
-  companion object {
-    val instance: ThemeSelectionService
-      get() = ApplicationManager.getApplication().getService(ThemeSelectionService::class.java)
-  }
 
   private var _preferredThemeIds: Set<String>
 
@@ -34,20 +30,20 @@ class ThemeSelectionService {
 
   fun reHydrateSelections(isLocalSync: Boolean = Config.instance.isLocalSync) {
     // todo: might need to not run on AWT thread.
-    if (isLocalSync) {
-      rehydrateFromSelections(LocalThemeSelectionService.getInitialItem())
-    } else {
-      rehydrateFromSelections(getThemeSelectionsFromConfigs())
+    when {
+      isLocalSync -> rehydrateFromSelections(LocalThemeSelectionService.getInitialItem())
+      else -> rehydrateFromSelections(getThemeSelectionsFromConfigs())
     }
   }
 
   val preferredThemeIds: Set<String>
-    get() {
-      return _preferredThemeIds
-    }
+    get() = _preferredThemeIds
 
   val blackListedThemeIds: Set<String>
-    get() {
-      return _blackListedThemeIds
-    }
+    get() = _blackListedThemeIds
+
+  companion object {
+    val instance: ThemeSelectionService
+      get() = ApplicationManager.getApplication().getService(ThemeSelectionService::class.java)
+  }
 }

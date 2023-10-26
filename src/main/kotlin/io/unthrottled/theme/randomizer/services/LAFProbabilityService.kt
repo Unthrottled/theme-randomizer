@@ -19,14 +19,6 @@ import kotlin.random.Random
 @Suppress("UnstableApiUsage")
 @Service(Service.Level.APP)
 class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
-  companion object {
-    val instance: LAFProbabilityService
-      get() = ApplicationManager.getApplication().getService(LAFProbabilityService::class.java)
-
-    private const val DEFAULT_IDLE_TIMEOUT_IN_MINUTES = 5L
-    private const val THEME_DEBOUNCE_DURATION_IN_MINUTES = 2L
-  }
-
   private val debouncer = AlarmDebouncer<UIThemeLookAndFeelInfo>(
     TimeUnit.MILLISECONDS.convert(
       THEME_DEBOUNCE_DURATION_IN_MINUTES,
@@ -50,9 +42,8 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
   private val seenAssetLedger = ThemeObservationService.getInitialItem()
 
   private val random = java.util.Random()
-  private val probabilityTools = ProbabilityTools(
-    Random(System.currentTimeMillis())
-  )
+
+  private val probabilityTools = ProbabilityTools(Random(System.currentTimeMillis()))
 
   fun pickAssetFromList(themes: Collection<UIThemeLookAndFeelInfo>): Optional<out UIThemeLookAndFeelInfo>? {
     val seenTimes = themes.map { getSeenCount(it) }
@@ -61,12 +52,7 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     return probabilityTools.pickFromWeightedList(
       themes.map {
         val timesObserved = getSeenCount(it)
-        it to 1 + (
-          (
-            abs(random.nextGaussian()) *
-              totalItems.toDouble().pow(maxSeen - timesObserved)
-            )
-          ).toLong()
+        it to 1 + (abs(random.nextGaussian()) * totalItems.toDouble().pow(maxSeen - timesObserved)).toLong()
       }.shuffled(random)
     )
   }
@@ -87,18 +73,16 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
   @Suppress("UnstableApiUsage")
   private fun onChanged(lookAndFeelInfo: UIThemeLookAndFeelInfo) {
     val themeId = lookAndFeelInfo.id
-    seenAssetLedger.assetSeenCounts[themeId] =
-      getAssetSeenCount(themeId) + 1
+    seenAssetLedger.assetSeenCounts[themeId] = getAssetSeenCount(themeId) + 1
   }
 
   // This prevents newly seen assets from always being
   // biased to be shown to the user.
   private fun getAssetSeenCount(lookAndFeelId: String): Int {
     val seenAssets = seenAssetLedger.assetSeenCounts
-    return if (seenAssets.containsKey(lookAndFeelId)) {
-      seenAssets[lookAndFeelId]!!
-    } else {
-      floor(seenAssets.entries.map { it.value }.average()).toInt()
+    return when {
+      seenAssets.containsKey(lookAndFeelId) -> seenAssets[lookAndFeelId]!!
+      else -> floor(seenAssets.entries.map { it.value }.average()).toInt()
     }
   }
 
@@ -112,8 +96,15 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
   @Suppress("UnstableApiUsage")
   override fun lookAndFeelChanged(source: LafManager) {
     val currentTheme = source.currentUIThemeLookAndFeel
-    debouncer.debounce {
-      onChanged(currentTheme)
-    }
+    debouncer.debounce { onChanged(currentTheme) }
   }
+
+  companion object {
+    val instance: LAFProbabilityService
+      get() = ApplicationManager.getApplication().getService(LAFProbabilityService::class.java)
+
+    private const val DEFAULT_IDLE_TIMEOUT_IN_MINUTES = 5L
+    private const val THEME_DEBOUNCE_DURATION_IN_MINUTES = 2L
+  }
+
 }

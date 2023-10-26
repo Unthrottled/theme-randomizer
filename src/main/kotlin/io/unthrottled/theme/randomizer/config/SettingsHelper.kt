@@ -1,7 +1,6 @@
 package io.unthrottled.theme.randomizer.config
 
 object SettingsHelper {
-
   @JvmStatic
   fun getDisplayMapping(changeIntervals: ChangeIntervals): String =
     when (changeIntervals) {

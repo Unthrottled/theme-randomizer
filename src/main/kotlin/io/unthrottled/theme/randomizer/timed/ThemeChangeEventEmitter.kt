@@ -26,17 +26,10 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   private val messageBus = ApplicationManager.getApplication().messageBus.connect()
   private val themeChangeAlarm = Alarm()
 
-  companion object {
-    private const val MAX_CHECK_INTERVAL = 5L
-  }
-
   private val reSubscriber = {
     if (themeChangeAlarm.isEmpty && Config.instance.isChangeTheme) {
       val duration = getDuration()
-      themeChangeAlarm.addRequest(
-        this,
-        convertMinutesToMillis(duration)
-      )
+      themeChangeAlarm.addRequest(this, convertMinutesToMillis(duration))
     }
   }
 
@@ -46,9 +39,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
       ConfigListener.CONFIG_TOPIC,
       ConfigListener { newPluginState, _ ->
         themeChangeAlarm.cancelAllRequests()
-        if (newPluginState.isChangeTheme &&
-          newPluginState.pluginMode.toPluginMode() == PluginMode.TIMED
-        ) {
+        if (newPluginState.isChangeTheme && newPluginState.pluginMode.toPluginMode() == PluginMode.TIMED) {
           themeChangeAlarm.addRequest(
             self,
             convertMinutesToMillis(
@@ -58,14 +49,17 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
         }
       }
     )
+
     messageBus.subscribe(
       LafManagerListener.TOPIC,
       this
     )
+
     themeChangeAlarm.addRequest(
       this,
       convertMinutesToMillis(getDuration())
     )
+
     IdeEventQueue.getInstance().addIdleListener(
       reSubscriber,
       convertMinutesToMillis(MAX_CHECK_INTERVAL)
@@ -73,26 +67,17 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   }
 
   private fun getDuration(): Long {
-    if (Config.instance.lastChangeTime < 0) {
-      captureTimestamp()
-    }
+    if (Config.instance.lastChangeTime < 0) captureTimestamp()
     return getThemeSwitchCheckInterval()
   }
 
   private fun scheduleThemeChange() {
-    themeChangeAlarm.addRequest(
-      this,
-      convertMinutesToMillis(getThemeSwitchCheckInterval())
-    )
+    themeChangeAlarm.addRequest(this, convertMinutesToMillis(getThemeSwitchCheckInterval()))
   }
 
-  private fun convertMinutesToMillis(duration: Long) = TimeUnit.MILLISECONDS.convert(
-    duration,
-    TimeUnit.MINUTES
-  ).toInt()
+  private fun convertMinutesToMillis(duration: Long) = TimeUnit.MILLISECONDS.convert(duration, TimeUnit.MINUTES).toInt()
 
-  private fun getThemeSwitchCheckInterval(): Long =
-    getThemeSwitchCheckIntervalFromState(Config.instance)
+  private fun getThemeSwitchCheckInterval(): Long = getThemeSwitchCheckIntervalFromState(Config.instance)
 
   private fun getThemeSwitchCheckIntervalFromState(newPluginState: Config): Long =
     minOf(
@@ -116,11 +101,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
 
     ThemeService.instance.nextTheme(getCurrentSelectableThemeType())
       ?.ifPresent {
-        QuickChangeLookAndFeel.switchLafAndUpdateUI(
-          LafManager.getInstance(),
-          it,
-          true
-        )
+        QuickChangeLookAndFeel.switchLafAndUpdateUI(LafManager.getInstance(), it, true)
         themeSet = it
         captureTimestamp()
       }
@@ -159,5 +140,9 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
       themeSet = currentLookAndFeel
       captureTimestamp()
     }
+  }
+
+  companion object {
+    private const val MAX_CHECK_INTERVAL = 5L
   }
 }

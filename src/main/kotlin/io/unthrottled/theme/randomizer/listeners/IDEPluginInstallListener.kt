@@ -8,7 +8,6 @@ import io.unthrottled.theme.randomizer.config.Constants.PLUGIN_ID
 import io.unthrottled.theme.randomizer.tools.Logging
 
 class IDEPluginInstallListener : DynamicPluginListener, Logging {
-
   override fun beforePluginLoaded(pluginDescriptor: IdeaPluginDescriptor) {
   }
 

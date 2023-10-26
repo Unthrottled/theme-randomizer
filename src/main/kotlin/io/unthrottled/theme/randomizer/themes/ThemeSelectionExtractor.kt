@@ -8,13 +8,10 @@ data class ThemeSelections(
 )
 
 object ThemeSelectionExtractor {
-
-  fun extractThemeSelectionsFromConfig(config: Config): ThemeSelections {
-    return ThemeSelections(
-      preferredThemeIdSet = extractAllowedCharactersFromState(config.selectedThemes),
-      blacklistedThemeIdSet = extractAllowedCharactersFromState(config.blacklistedThemes)
-    )
-  }
+  fun extractThemeSelectionsFromConfig(config: Config): ThemeSelections = ThemeSelections(
+    preferredThemeIdSet = extractAllowedCharactersFromState(config.selectedThemes),
+    blacklistedThemeIdSet = extractAllowedCharactersFromState(config.blacklistedThemes)
+  )
 
   private fun extractAllowedCharactersFromState(characterConfig: String): Set<String> =
     characterConfig.split(Config.DEFAULT_DELIMITER)
