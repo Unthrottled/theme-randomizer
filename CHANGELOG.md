@@ -7,7 +7,7 @@
 
 ### Added
 
-- Initial 2023.1 build support.
+- Initial 2023.3 build support.
 
 
 # 0.8.2

@@ -3,7 +3,7 @@
   <name>Theme Randomizer</name>
   <vendor>Unthrottled</vendor>
 
-  <!-- Product and plugin compatibility requirementsR -->
+  <!-- Product and plugin compatibility requirements -->
   <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
   <depends>com.intellij.modules.platform</depends>
 
