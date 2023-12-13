@@ -211,4 +211,12 @@ public class PluginSettingsUI implements SearchableConfigurable, Configurable.No
       .map(ThemeGatekeeper::getId)
       .collect(Collectors.joining(Config.DEFAULT_DELIMITER));
   }
+
+
+  @Override
+  public @Nullable String getDisplayNameFast() {
+    return "Theme Randomizer";
+  }
+
+
 }

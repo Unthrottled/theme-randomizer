@@ -9,6 +9,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable id="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
+                             displayName="Theme Randomizer"
                              instance="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
                              groupId="appearance"
     />
