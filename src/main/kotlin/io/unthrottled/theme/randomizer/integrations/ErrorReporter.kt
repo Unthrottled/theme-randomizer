@@ -121,7 +121,7 @@ class ErrorReporter : ErrorReportSubmitter() {
   }
 
   private fun getNonBundledPlugins(): String {
-    return Arrays.stream(PluginManagerCore.getPlugins())
+    return PluginManagerCore.getPluginSet().allPlugins.stream()
       .filter { p -> !p.isBundled && p.isEnabled }
       .map { p -> p.pluginId.idString }.collect(Collectors.joining(","))
   }
