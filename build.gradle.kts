@@ -48,76 +48,50 @@ version = pluginVersion
 repositories {
   mavenCentral()
   mavenLocal()
+  gradlePluginPortal()
+
+  intellijPlatform {
+    defaultRepositories()
+    jetbrainsRuntime()
+  }
 }
+
 dependencies {
   detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.22.0")
   implementation("commons-io:commons-io:2.11.0")
   implementation("io.sentry:sentry:6.18.1")
   testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("io.mockk:mockk:1.13.5")
+
+  intellijPlatform {
+    intellijIdeaUltimate(platformVersion, useInstaller = false)
+    instrumentationTools()
+    pluginVerifier()
+    zipSigner()
+
+    bundledPlugins(
+      "com.intellij.java",
+    )
+  }
+}
+
+kotlin {
+  jvmToolchain(21)
 }
 
 configurations {
   implementation.configure {
-    // sentry brings in a slf4j that breaks when
-    // with the platform slf4j
     exclude("org.slf4j")
   }
 }
 
-// Configure gradle-intellij-plugin plugin.
-// Read more: https://github.com/JetBrains/gradle-intellij-plugin
-intellij {
-  pluginName = this@Build_gradle.pluginName
-  version = platformVersion
-  type = platformType
-  downloadSources = platformDownloadSources.toBoolean()
-  updateSinceUntilBuild = true
-
-  // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-  plugins = platformPlugins.split(',')
-    .filter { System.getenv("ENV") == "DOKI" }
-    .map(String::trim)
-    .filter(String::isNotEmpty)
-
-}
-
-// Configure detekt plugin.
-// Read more: https://detekt.github.io/detekt/kotlindsl.html
-detekt {
-  config.setFrom("./detekt-config.yml")
-  buildUponDefaultConfig = true
-  autoCorrect = true
-}
-
-tasks {
-  withType<JavaCompile> {
-    sourceCompatibility = "17"
-    targetCompatibility = "17"
-  }
-  withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-  }
-
-  withType<Detekt> {
-    jvmTarget = "17"
-  }
-
-  wrapper {
-    gradleVersion = properties("gradleVersion")
-  }
-
-  runIde {
-    maxHeapSize = "2g"
-  }
-
-  patchPluginXml {
+intellijPlatform {
+  pluginConfiguration {
+    id = pluginGroup
+    name = pluginName
     version = pluginVersion
-    sinceBuild = pluginSinceBuild
-    untilBuild = pluginUntilBuild
 
-    // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-    pluginDescription = File("./README.md").readText().lines().run {
+    description = File("./README.md").readText().lines().run {
       val start = "<!-- Plugin description -->"
       val end = "<!-- Plugin description end -->"
 
@@ -127,26 +101,54 @@ tasks {
       subList(indexOf(start) + 1, indexOf(end))
     }.joinToString("\n").run { markdownToHTML(this) }
 
+    ideaVersion {
+      sinceBuild = pluginSinceBuild
+      untilBuild = pluginUntilBuild
+    }
 
     changeNotes = provider {
       markdownToHTML(File("./docs/RELEASE-NOTES.md").readText())
     }
-
   }
 
-  runPluginVerifier {
-    ideVersions = pluginVerifierIdeVersions.split(',')
-      .map(String::trim)
-      .filter(String::isNotEmpty)
-
-  }
-
-  publishPlugin {
-    dependsOn("patchChangelog")
-    token = System.getenv("PUBLISH_TOKEN")
-    // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
-    // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
-    // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
+  publishing {
+    token = environment("PUBLISH_TOKEN")
     channels = listOf(pluginVersion.split('-').getOrElse(1) { "default" }.split('.').first())
+  }
+
+  signing {
+    certificateChain = environment("CERTIFICATE_CHAIN")
+    privateKey = environment("PRIVATE_KEY")
+    password = environment("PRIVATE_KEY_PASSWORD")
+  }
+}
+
+detekt {
+  config.setFrom("./detekt-config.yml")
+  buildUponDefaultConfig = true
+  autoCorrect = true
+}
+
+tasks {
+  withType<JavaCompile> {
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+    options.compilerArgs = listOf("-Xlint:deprecation", "-Xlint:unchecked")
+  }
+
+  withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "21"
+  }
+
+  withType<Detekt> {
+    jvmTarget = "21"
+  }
+
+  wrapper {
+    gradleVersion = properties("gradleVersion")
+  }
+
+  runIde {
+    maxHeapSize = "2g"
   }
 }
