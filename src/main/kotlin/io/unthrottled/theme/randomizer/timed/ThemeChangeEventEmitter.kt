@@ -121,6 +121,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     ChangeIntervals.getValue(config.interval)
       .map {
         when (it) {
+          ChangeIntervals.MINUTE -> 1L
           ChangeIntervals.THIRTY_MINUTES -> 30L
           ChangeIntervals.HOUR -> 60L
           ChangeIntervals.DAY -> 1440L

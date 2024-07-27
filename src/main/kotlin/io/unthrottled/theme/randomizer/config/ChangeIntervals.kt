@@ -5,6 +5,7 @@ import io.unthrottled.theme.randomizer.tools.toOptional
 import java.util.*
 
 enum class ChangeIntervals {
+  MINUTE,
   THIRTY_MINUTES,
   HOUR,
   DAY,
