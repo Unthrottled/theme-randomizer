@@ -2,7 +2,6 @@
 
 package io.unthrottled.theme.randomizer.timed
 
-import com.intellij.ide.IdeEventQueue
 import com.intellij.ide.actions.QuickChangeLookAndFeel
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
@@ -16,7 +15,12 @@ import io.unthrottled.theme.randomizer.config.ConfigListener
 import io.unthrottled.theme.randomizer.mode.PluginMode
 import io.unthrottled.theme.randomizer.mode.getCurrentSelectableThemeType
 import io.unthrottled.theme.randomizer.mode.toPluginMode
+import io.unthrottled.theme.randomizer.services.LAFProbabilityService.Companion.DEFAULT_IDLE_TIMEOUT_IN_MINUTES
 import io.unthrottled.theme.randomizer.themes.ThemeService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -25,8 +29,19 @@ import java.util.concurrent.TimeUnit
 class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   private val messageBus = ApplicationManager.getApplication().messageBus.connect()
   private val themeChangeAlarm = Alarm()
+  private val scope = CoroutineScope(Dispatchers.Default)
+  private val idleJob = scope.launch {
+    delay(
+      TimeUnit.MILLISECONDS.convert(
+        DEFAULT_IDLE_TIMEOUT_IN_MINUTES,
+        TimeUnit.MINUTES
+      )
+    )
+    reSubscribe()
+    run()
+  }
 
-  private val reSubscriber = {
+  private val reSubscribe = {
     if (themeChangeAlarm.isEmpty && Config.instance.isChangeTheme) {
       val duration = getDuration()
       themeChangeAlarm.addRequest(this, convertMinutesToMillis(duration))
@@ -60,10 +75,11 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
       convertMinutesToMillis(getDuration())
     )
 
-    IdeEventQueue.getInstance().addIdleListener(
-      reSubscriber,
-      convertMinutesToMillis(MAX_CHECK_INTERVAL)
-    )
+    // IdeEventQueue.getInstance().addIdleListener(
+    //   reSubscriber,
+    //   convertMinutesToMillis(MAX_CHECK_INTERVAL)
+    // )
+    idleJob.start()
   }
 
   private fun getDuration(): Long {
@@ -91,7 +107,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
   override fun dispose() {
     messageBus.dispose()
     themeChangeAlarm.dispose()
-    IdeEventQueue.getInstance().removeIdleListener(reSubscriber)
+    idleJob.cancel()
   }
 
   private var themeSet: UIThemeLookAndFeelInfo = LafManager.getInstance().currentUIThemeLookAndFeel
@@ -105,6 +121,7 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
         themeSet = it
         captureTimestamp()
       }
+
     scheduleThemeChange()
   }
 
@@ -121,13 +138,16 @@ class ThemeChangeEventEmitter : Runnable, LafManagerListener, Disposable {
     ChangeIntervals.getValue(config.interval)
       .map {
         when (it) {
-          ChangeIntervals.MINUTE -> 1L
-          ChangeIntervals.THIRTY_MINUTES -> 30L
-          ChangeIntervals.HOUR -> 60L
-          ChangeIntervals.DAY -> 1440L
-          ChangeIntervals.TWO_DAYS -> 2880L
-          ChangeIntervals.WEEK -> 10080L
-          else -> 60L
+          ChangeIntervals.MINUTE          -> 1L
+          ChangeIntervals.THIRTY_MINUTES  -> 30L
+          ChangeIntervals.HOUR            -> 60L
+          ChangeIntervals.DAY             -> 1440L
+          ChangeIntervals.TWO_DAYS        -> 2880L
+          ChangeIntervals.WEEK            -> 10080L
+          ChangeIntervals.FIVE_MINUTES    -> 5L
+          ChangeIntervals.TEN_MINUTES     -> 10L
+          ChangeIntervals.FIFTEEN_MINUTES -> 15L
+          else                            -> 60L
         }
       }.orElse(60L)
 

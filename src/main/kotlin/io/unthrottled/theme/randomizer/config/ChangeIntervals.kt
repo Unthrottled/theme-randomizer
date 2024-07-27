@@ -6,6 +6,9 @@ import java.util.*
 
 enum class ChangeIntervals {
   MINUTE,
+  FIVE_MINUTES,
+  TEN_MINUTES,
+  FIFTEEN_MINUTES,
   THIRTY_MINUTES,
   HOUR,
   DAY,

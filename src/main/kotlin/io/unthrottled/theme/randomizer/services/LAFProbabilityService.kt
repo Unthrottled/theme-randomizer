@@ -1,6 +1,5 @@
 package io.unthrottled.theme.randomizer.services
 
-import com.intellij.ide.IdeEventQueue
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.ide.ui.laf.UIThemeLookAndFeelInfo
@@ -9,6 +8,10 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import io.unthrottled.theme.randomizer.tools.AlarmDebouncer
 import io.unthrottled.theme.randomizer.tools.ProbabilityTools
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -28,15 +31,20 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
 
   private val messageBusConnection = ApplicationManager.getApplication().messageBus.connect()
 
-  init {
-    messageBusConnection.subscribe(LafManagerListener.TOPIC, this)
-    IdeEventQueue.getInstance().addIdleListener(
-      this,
+  private val scope = CoroutineScope(Dispatchers.Default)
+  private val idleJob = scope.launch {
+    delay(
       TimeUnit.MILLISECONDS.convert(
         DEFAULT_IDLE_TIMEOUT_IN_MINUTES,
         TimeUnit.MINUTES
-      ).toInt()
+      )
     )
+    run()
+  }
+
+  init {
+    messageBusConnection.subscribe(LafManagerListener.TOPIC, this)
+    idleJob.start()
   }
 
   private val seenAssetLedger = ThemeObservationService.getInitialItem()
@@ -67,7 +75,7 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
   override fun dispose() {
     messageBusConnection.dispose()
     ThemeObservationService.persistLedger(seenAssetLedger)
-    IdeEventQueue.getInstance().removeIdleListener(this)
+    idleJob.cancel()
   }
 
   @Suppress("UnstableApiUsage")
@@ -82,7 +90,7 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     val seenAssets = seenAssetLedger.assetSeenCounts
     return when {
       seenAssets.containsKey(lookAndFeelId) -> seenAssets[lookAndFeelId]!!
-      else -> floor(seenAssets.entries.map { it.value }.average()).toInt()
+      else                                  -> floor(seenAssets.entries.map { it.value }.average()).toInt()
     }
   }
 
@@ -103,8 +111,8 @@ class LAFProbabilityService : Disposable, LafManagerListener, Runnable {
     val instance: LAFProbabilityService
       get() = ApplicationManager.getApplication().getService(LAFProbabilityService::class.java)
 
-    private const val DEFAULT_IDLE_TIMEOUT_IN_MINUTES = 5L
-    private const val THEME_DEBOUNCE_DURATION_IN_MINUTES = 2L
+    internal const val DEFAULT_IDLE_TIMEOUT_IN_MINUTES = 5L
+    internal const val THEME_DEBOUNCE_DURATION_IN_MINUTES = 2L
   }
 
 }
