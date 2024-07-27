@@ -1,49 +1,46 @@
 <idea-plugin>
-  <id>io.unthrottled.theme.randomizer</id>
-  <name>Theme Randomizer</name>
-  <vendor>Unthrottled</vendor>
+    <id>io.unthrottled.theme.randomizer</id>
+    <name>Theme Randomizer</name>
+    <vendor>Unthrottled</vendor>
 
-  <!-- Product and plugin compatibility requirementsR -->
-  <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-  <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.platform</depends>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable id="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
-                             displayName="Theme Randomizer"
-                             instance="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
-                             groupId="appearance"
-    />
-    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
-    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeGatekeeper"/>
-    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeService"/>
-    <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeSelectionService"/>
-    <notificationGroup displayType="BALLOON" id="Theme Randomizer Updates" toolWindowId="Theme Randomizer Updates" isLogByDefault="false" />
-    <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
-    <postStartupActivity implementation="io.unthrottled.theme.randomizer.listeners.MyPostStartupActivity" />
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable id="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
+                                 displayName="Theme Randomizer"
+                                 instance="io.unthrottled.theme.randomizer.ui.PluginSettingsUI"
+                                 groupId="appearance"
+        />
+        <applicationService serviceImplementation="io.unthrottled.theme.randomizer.config.Config"/>
+        <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeGatekeeper"/>
+        <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeService"/>
+        <applicationService serviceImplementation="io.unthrottled.theme.randomizer.themes.ThemeSelectionService"/>
+        <notificationGroup displayType="BALLOON" id="Theme Randomizer Updates" toolWindowId="Theme Randomizer Updates"
+                           isLogByDefault="false" bundle="messages.MyBundle" key="notification.group.theme.randomizer.updates"/>
+        <errorHandler implementation="io.unthrottled.theme.randomizer.integrations.ErrorReporter"/>
+        <postStartupActivity implementation="io.unthrottled.theme.randomizer.listeners.MyPostStartupActivity"/>
+    </extensions>
 
-  <applicationListeners>
-    <listener class="io.unthrottled.theme.randomizer.listeners.IDEPluginInstallListener"
-              topic="com.intellij.ide.plugins.DynamicPluginListener"/>
-    <listener class="io.unthrottled.theme.randomizer.themes.ThemeSelectionConfigListener"
-              topic="io.unthrottled.theme.randomizer.config.ConfigListener"/>
-  </applicationListeners>
+    <applicationListeners>
+        <listener class="io.unthrottled.theme.randomizer.listeners.IDEPluginInstallListener"
+                  topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+        <listener class="io.unthrottled.theme.randomizer.themes.ThemeSelectionConfigListener"
+                  topic="io.unthrottled.theme.randomizer.config.ConfigListener"/>
+    </applicationListeners>
 
-  <actions>
-    <group id="ThemeRandomizerActions" text="Theme Randomizer Options" popup="true">
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
-      <action id="theme.randomizer.settings" class="io.unthrottled.theme.randomizer.actions.ShowSettingsAction"
-              text="Show Theme Randomizer's Settings"
-              icon="AllIcons.General.GearPlain"
-              description="Displays theme randomizer's settings">
-        <keyboard-shortcut keymap="$default" first-keystroke="shift alt S"/>
-      </action>
-    </group>
+    <actions>
+        <group id="ThemeRandomizerActions" popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="theme.randomizer.settings" class="io.unthrottled.theme.randomizer.actions.ShowSettingsAction"
+                    icon="AllIcons.General.GearPlain">
+                <keyboard-shortcut keymap="$default" first-keystroke="shift alt S"/>
+            </action>
+        </group>
 
-    <action id="io.unthrottled.theme.randomizer.next-theme" class="io.unthrottled.theme.randomizer.actions.NextTheme"
-            text="Next Theme" description="Picks the next theme to use based on your preferences.">
-      <add-to-group group-id="ThemeRandomizerActions" anchor="after" relative-to-action="theme.randomizer.settings"/>
-    </action>
-  </actions>
+        <action id="io.unthrottled.theme.randomizer.next-theme" class="io.unthrottled.theme.randomizer.actions.NextTheme">
+            <add-to-group group-id="ThemeRandomizerActions" anchor="after" relative-to-action="theme.randomizer.settings"/>
+        </action>
+    </actions>
+    <resource-bundle>messages.MyBundle</resource-bundle>
 
 </idea-plugin>

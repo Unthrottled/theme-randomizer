@@ -76,7 +76,7 @@ dependencies {
 }
 
 kotlin {
-  jvmToolchain(21)
+  jvmToolchain(17)
 }
 
 configurations {
@@ -131,17 +131,17 @@ detekt {
 
 tasks {
   withType<JavaCompile> {
-    sourceCompatibility = "21"
-    targetCompatibility = "21"
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
     options.compilerArgs = listOf("-Xlint:deprecation", "-Xlint:unchecked")
   }
 
   withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "21"
+    kotlinOptions.jvmTarget = "17"
   }
 
   withType<Detekt> {
-    jvmTarget = "21"
+    jvmTarget = "17"
   }
 
   wrapper {
