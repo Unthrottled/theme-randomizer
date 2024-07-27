@@ -99,7 +99,7 @@ class ErrorReporter : ErrorReportSubmitter() {
       setExtra("Memory", Runtime.getRuntime().maxMemory() / FileUtilRt.MEGABYTE)
       setExtra("Cores", Runtime.getRuntime().availableProcessors())
       setExtra("Non-Bundled Plugins", getNonBundledPlugins())
-      setExtra("Current LAF", LafManager.getInstance().currentLookAndFeel?.name ?: "")
+      setExtra("Current LAF", LafManager.getInstance().currentUIThemeLookAndFeel?.name ?: "")
       setExtra("Plugin Config", gson.toJson(Config.instance))
     }
   }

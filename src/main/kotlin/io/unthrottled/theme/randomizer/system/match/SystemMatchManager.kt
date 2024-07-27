@@ -59,7 +59,7 @@ internal object SystemStateObserver {
     val didSystemTypeChange = lastObservedSystemType == null || lastObservedSystemType != currentSystemType
     return when {
       didSystemTypeChange -> SystemStateObservation.CHANGED
-      else -> SystemStateObservation.SAME
+      else                -> SystemStateObservation.SAME
     }
   }
 }
@@ -92,7 +92,7 @@ object SystemMatchManager : Disposable {
       handleSystemUpdateEvent(
         when {
           systemIsDark -> SystemType.DARK
-          else -> SystemType.LIGHT
+          else         -> SystemType.LIGHT
         }
       )
     }
@@ -130,7 +130,7 @@ object SystemMatchManager : Disposable {
   }
 
   private fun getPreviousThemePropertyKey(systemType: SystemType) = when (systemType) {
-    SystemType.DARK -> "randomizer.system.match.dark.previous"
+    SystemType.DARK  -> "randomizer.system.match.dark.previous"
     SystemType.LIGHT -> "randomizer.system.match.light.previous"
   }
 
@@ -149,18 +149,18 @@ object SystemMatchManager : Disposable {
       .map { it.toOptional() }
       // if the property key or the saved theme isn't installed
       // pick another theme...
-      .orElseGet { ThemeService.instance.nextTheme(currentSystemType.selectableThemeType) as Optional<UIThemeLookAndFeelInfo>? }
+      .orElseGet { ThemeService.instance.nextTheme(currentSystemType.selectableThemeType) as Optional<UIThemeLookAndFeelInfo> }
   }
 
   private fun shouldChooseNewTheme(currentSystemType: SystemType): Boolean =
     when (currentSystemType) {
-      SystemType.DARK -> Config.instance.darkSystemObservedCounts > Config.instance.changeOnSystemSwitches
+      SystemType.DARK  -> Config.instance.darkSystemObservedCounts > Config.instance.changeOnSystemSwitches
       SystemType.LIGHT -> Config.instance.lightSystemObservedCounts > Config.instance.changeOnSystemSwitches
     }
 
   private fun adjustObservations(currentSystemType: SystemType) {
     when (currentSystemType) {
-      SystemType.DARK -> Config.instance.darkSystemObservedCounts = 0
+      SystemType.DARK  -> Config.instance.darkSystemObservedCounts = 0
       SystemType.LIGHT -> Config.instance.lightSystemObservedCounts = 0
     }
   }

@@ -1,1 +1,1 @@
-rootProject.name = "theme-randomizer"
+rootProject.name = "theme-randomizer-fork"

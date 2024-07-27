@@ -1,6 +1,7 @@
 <idea-plugin>
-    <id>io.unthrottled.theme.randomizer</id>
-    <name>Theme Randomizer</name>
+    <id>com.mallowigi.randomizer</id>
+    <name>Theme Randomizer Fork</name>
+    <vendor>AtomMaterialUI</vendor>
     <vendor>Unthrottled</vendor>
 
     <depends>com.intellij.modules.platform</depends>
