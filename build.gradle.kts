@@ -6,7 +6,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 fun properties(key: String) = providers.gradleProperty(key).get()
 
 /**
- * Returns the value of the environment variable associated with the specified key.
+ * Returns the value of the environment variable associated with the
+ * specified key.
  *
  * @param key the key of the environment variable
  * @return the value of the environment variable as a Provider<String>
@@ -142,6 +143,10 @@ tasks {
 
   withType<Detekt> {
     jvmTarget = "17"
+  }
+
+  buildSearchableOptions {
+    enabled = false
   }
 
   wrapper {
